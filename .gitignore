@@ -1,0 +1,2 @@
+# Ignore les dossiers node_modules dans les deux projets
+**/node_modules/
