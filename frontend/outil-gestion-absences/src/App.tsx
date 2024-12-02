@@ -4,6 +4,10 @@
 import "./App.css";
 import React from "react";
 
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+
 const App: React.FC = () => {
   // const [count, setCount] = useState(0);
 
@@ -29,6 +33,10 @@ const App: React.FC = () => {
       <div className="App">
         <button onClick={handleClick}>Cliquez pour dire Bonjour</button>
       </div>
+
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DateCalendar />
+      </LocalizationProvider>
     </>
 
     // <>
