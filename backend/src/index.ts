@@ -1,6 +1,7 @@
 // src/index.ts
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
+import rolesRoutes from "./Routes/RolesRoutes";
 
 // Initialiser l'application Express
 const app = express();
@@ -14,6 +15,13 @@ app.get("/bonjour", (req, res) => {
   console.log("Bonjour dans le terminal !");
   res.status(200).send("Bonjour envoyé au terminal !");
 });
+
+app.get("/api/data", (req: Request, res: Response): void => {
+  const data = { message: "Données récupérées avec succès !" };
+  res.json(data);
+});
+
+app.use("/api/roles", rolesRoutes);
 
 // Démarrer le serveur
 app.listen(port, () => {
