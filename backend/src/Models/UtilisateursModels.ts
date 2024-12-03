@@ -14,7 +14,7 @@ export interface Utilisateurs {
   nbAbsences: number;
   tempsTotRetards: number;
   tempsTotAbsences: number;
-  semestreRetardabsenses: string;
+  semestreRetardsAbsenses: string;
   nbEssais: number;
 }
 

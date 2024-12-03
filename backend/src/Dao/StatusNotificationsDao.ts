@@ -7,11 +7,11 @@ class StatusNotificationDao {
     statusNotification: StatusNotification
   ): Promise<StatusNotification> {
     const query = `
-            INSERT INTO public."statusNotification" (status) 
-            VALUES ($1)
+            INSERT INTO public."StatusNotifications" (idStatusNotifications, status) 
+            VALUES (gen_random_uuid(), $1)
             RETURNING *;
         `;
-    const values = [statusNotification.statusNotification];
+    const values = [statusNotification.statusNotifications];
 
     try {
       const result: QueryResult = await pool.query(query, values);
@@ -25,7 +25,7 @@ class StatusNotificationDao {
 
   async findAll(): Promise<StatusNotification[]> {
     const query = `
-            SELECT * FROM public."statusNotification";
+            SELECT * FROM public."StatusNotifications";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -39,7 +39,7 @@ class StatusNotificationDao {
 
   async findById(id: number): Promise<StatusNotification> {
     const query = `
-            SELECT * FROM public."statusNotification" WHERE idStatusNotification = $1;
+            SELECT * FROM public."StatusNotifications" WHERE idStatusNotifications = $1;
         `;
     const values = [id];
     try {
@@ -56,14 +56,14 @@ class StatusNotificationDao {
     statusNotification: StatusNotification
   ): Promise<StatusNotification> {
     const query = `
-            UPDATE public."statusNotification"
+            UPDATE public."StatusNotifications"
             SET status = $1
-            WHERE idStatusNotification = $2
+            WHERE idStatusNotifications = $2
             RETURNING *;
         `;
     const values = [
-      statusNotification.statusNotification,
-      statusNotification.idStatusNotification,
+      statusNotification.statusNotifications,
+      statusNotification.idStatusNotifications,
     ];
 
     try {
@@ -78,7 +78,7 @@ class StatusNotificationDao {
 
   async deleteStatusNotifications(id: number): Promise<StatusNotification> {
     const query = `
-            DELETE FROM public."statusNotification" WHERE idStatusNotification = $1
+            DELETE FROM public."StatusNotifications" WHERE idStatusNotifications = $1
             RETURNING *;
         `;
     const values = [id];

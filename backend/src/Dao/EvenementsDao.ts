@@ -5,8 +5,8 @@ import Evenements from "../Models/EvenementsModels";
 class EvenementsDao {
   async createEvenements(evenements: Evenements): Promise<Evenements> {
     const query = `
-            INSERT INTO public."evenements" (nom, description, date, lieu, idUser) 
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO public."Evenements" (idEvenements, idTypeEvenements, commentaire, dateDebut, dateFin, duree) 
+            VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)
             RETURNING *;
         `;
     const values = [
@@ -29,7 +29,7 @@ class EvenementsDao {
 
   async findAll(): Promise<Evenements[]> {
     const query = `
-            SELECT * FROM public."evenements";
+            SELECT * FROM public."Evenements";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -43,7 +43,7 @@ class EvenementsDao {
 
   async findById(id: number): Promise<Evenements> {
     const query = `
-            SELECT * FROM public."evenements" WHERE idEvenements = $1;
+            SELECT * FROM public."Evenements" WHERE idEvenements = $1;
         `;
     const values = [id];
     try {
@@ -58,8 +58,8 @@ class EvenementsDao {
 
   async updateEvenements(evenements: Evenements): Promise<Evenements> {
     const query = `
-            UPDATE public."evenements"
-            SET nom = $1, description = $2, date = $3, lieu = $4, idUser = $5
+            UPDATE public."Evenements"
+            SET idTypeEvenements = $1, commentaire = $2, dateDebut = $3, dateFin = $4, duree = $5
             WHERE idEvenements = $6
             RETURNING *;
         `;
@@ -83,7 +83,7 @@ class EvenementsDao {
 
   async deleteEvenements(id: number): Promise<Evenements> {
     const query = `
-            DELETE FROM public."evenements"
+            DELETE FROM public."Evenements"
             WHERE idEvenements = $1
             RETURNING *;
         `;

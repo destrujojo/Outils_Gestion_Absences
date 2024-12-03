@@ -7,7 +7,7 @@ class NotificationsDao {
     notifications: Notifications
   ): Promise<Notifications> {
     const query = `
-            INSERT INTO public."notifications" (idStatusNotifications, message) 
+            INSERT INTO public."Notifications" (idStatusNotifications, message) 
             VALUES ($1, $2)
             RETURNING *;
         `;
@@ -25,7 +25,7 @@ class NotificationsDao {
 
   async findAll(): Promise<Notifications[]> {
     const query = `
-            SELECT * FROM public."notifications";
+            SELECT * FROM public."Notifications";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -39,7 +39,7 @@ class NotificationsDao {
 
   async findById(id: number): Promise<Notifications> {
     const query = `
-            SELECT * FROM public."notifications" WHERE idNotifications = $1;
+            SELECT * FROM public."Notifications" WHERE idNotifications = $1;
         `;
     const values = [id];
     try {
@@ -56,7 +56,7 @@ class NotificationsDao {
     notifications: Notifications
   ): Promise<Notifications> {
     const query = `
-            UPDATE public."notifications"
+            UPDATE public."Notifications"
             SET idStatusNotifications = $1, message = $2
             WHERE idNotifications = $3
             RETURNING *;
@@ -78,7 +78,7 @@ class NotificationsDao {
 
   async deleteNotifications(id: number): Promise<Notifications> {
     const query = `
-            DELETE FROM public."notifications"
+            DELETE FROM public."Notifications"
             WHERE idNotifications = $1
             RETURNING *;
         `;

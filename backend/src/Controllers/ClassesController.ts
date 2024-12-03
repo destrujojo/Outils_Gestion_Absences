@@ -4,9 +4,8 @@ const Classe = require("../Models/ClassesModels");
 
 class ClassesController {
   async createClasse(req: Request, res: Response) {
-    const classes = new Classe(req.body);
     try {
-      const newClasse = await ClassesDao.createClasses(classes);
+      const newClasse = await ClassesDao.createClasses(req.body);
       res.status(201).json(newClasse);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

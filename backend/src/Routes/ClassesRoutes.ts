@@ -5,7 +5,7 @@ const routerClasses = Router();
 
 routerClasses.get("/classesFindsAll", ClassesController.findAll);
 
-routerClasses.get("/classesFindsId/:id", ClassesController.findById);
+routerClasses.post("/classesFindsId", ClassesController.findById);
 
 routerClasses.post("/classesCreate", ClassesController.createClasse);
 

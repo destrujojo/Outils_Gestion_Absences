@@ -5,8 +5,8 @@ import Classes from "../Models/ClassesModels";
 class ClassesDao {
   async createClasses(classes: Classes): Promise<Classes> {
     const query = `
-            INSERT INTO public."classes" (class) 
-            VALUES ($1)
+            INSERT INTO public."Classes" (\"idClasses\", "classes") 
+            VALUES (gen_random_uuid(), $1)
             RETURNING *;
         `;
     const values = [classes.classes];
@@ -23,7 +23,7 @@ class ClassesDao {
 
   async findAll(): Promise<Classes[]> {
     const query = `
-            SELECT * FROM public."classes";
+            SELECT * FROM public."Classes";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -37,7 +37,7 @@ class ClassesDao {
 
   async findById(id: number): Promise<Classes> {
     const query = `
-            SELECT * FROM public."classes" WHERE idClasses = $1;
+            SELECT * FROM public."Classes" WHERE idClasses = $1;
         `;
     const values = [id];
     try {
@@ -52,8 +52,8 @@ class ClassesDao {
 
   async updateClasses(classes: Classes): Promise<Classes> {
     const query = `
-            UPDATE public."classes"
-            SET class = $1
+            UPDATE public."Classes"
+            SET classes = $1
             WHERE idClasses = $2
             RETURNING *;
         `;
@@ -70,7 +70,7 @@ class ClassesDao {
 
   async deleteClasses(id: number): Promise<Classes> {
     const query = `
-            DELETE FROM public."classes"
+            DELETE FROM public."Classes"
             WHERE idClasses = $1
             RETURNING *;
         `;

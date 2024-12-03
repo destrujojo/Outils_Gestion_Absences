@@ -7,8 +7,8 @@ class TypesEvenementsDao {
     typesEvenements: TypesEvenements
   ): Promise<TypesEvenements> {
     const query = `
-            INSERT INTO public."typesEvenements" (typesEvenements) 
-            VALUES ($1)
+            INSERT INTO public."TypesEvenements" (idTypesEvenements, typesEvenements) 
+            VALUES (gen_random_uuid(), $1)
             RETURNING *;
         `;
     const values = [typesEvenements.typesEvenements];
@@ -25,7 +25,7 @@ class TypesEvenementsDao {
 
   async findAll(): Promise<TypesEvenements[]> {
     const query = `
-            SELECT * FROM public."typesEvenements";
+            SELECT * FROM public."TypesEvenements";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -39,7 +39,7 @@ class TypesEvenementsDao {
 
   async findById(id: number): Promise<TypesEvenements> {
     const query = `
-            SELECT * FROM public."typesEvenements" WHERE idTypesEvenements = $1;
+            SELECT * FROM public."TypesEvenements" WHERE idTypesEvenements = $1;
         `;
     const values = [id];
     try {
@@ -56,7 +56,7 @@ class TypesEvenementsDao {
     typesEvenements: TypesEvenements
   ): Promise<TypesEvenements> {
     const query = `
-            UPDATE public."typesEvenements"
+            UPDATE public."TypesEvenements"
             SET typesEvenements = $1
             WHERE idTypesEvenements = $2
             RETURNING *;
@@ -77,7 +77,7 @@ class TypesEvenementsDao {
 
   async deleteTypesEvenements(id: number): Promise<TypesEvenements> {
     const query = `
-            DELETE FROM public."typesEvenements" WHERE idTypesEvenements = $1
+            DELETE FROM public."TypesEvenements" WHERE idTypesEvenements = $1
             RETURNING *;
         `;
     const values = [id];

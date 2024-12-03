@@ -7,8 +7,8 @@ class FormatsFichiersDao {
     formatsFichiers: FormatsFichiers
   ): Promise<FormatsFichiers> {
     const query = `
-            INSERT INTO public."formatsFichiers" (format) 
-            VALUES ($1)
+            INSERT INTO public."FormatsFichiers" (idFormatsFichiers, formatFichiers) 
+            VALUES (gen_random_uuid(), $1)
             RETURNING *;
         `;
     const values = [formatsFichiers.formatsFichiers];
@@ -25,7 +25,7 @@ class FormatsFichiersDao {
 
   async findAll(): Promise<FormatsFichiers[]> {
     const query = `
-            SELECT * FROM public."formatsFichiers";
+            SELECT * FROM public."FormatsFichiers";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -39,7 +39,7 @@ class FormatsFichiersDao {
 
   async findById(id: number): Promise<FormatsFichiers> {
     const query = `
-            SELECT * FROM public."formatsFichiers" WHERE idFormatsFichiers = $1;
+            SELECT * FROM public."FormatsFichiers" WHERE idFormatsFichiers = $1;
         `;
     const values = [id];
     try {
@@ -56,7 +56,7 @@ class FormatsFichiersDao {
     formatsFichiers: FormatsFichiers
   ): Promise<FormatsFichiers> {
     const query = `
-            UPDATE public."formatsFichiers"
+            UPDATE public."FormatsFichiers"
             SET format = $1
             WHERE idFormatsFichiers = $2
             RETURNING *;
@@ -77,7 +77,7 @@ class FormatsFichiersDao {
 
   async deleteFormatsFichiers(id: number): Promise<FormatsFichiers> {
     const query = `
-            DELETE FROM public."formatsFichiers" WHERE idFormatsFichiers = $1
+            DELETE FROM public."FormatsFichiers" WHERE idFormatsFichiers = $1
             RETURNING *;
         `;
     const values = [id];

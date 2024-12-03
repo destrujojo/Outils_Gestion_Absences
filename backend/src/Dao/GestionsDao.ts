@@ -5,8 +5,8 @@ import Gestions from "../Models/GestionsModels";
 class GestionsDao {
   async createGestions(gestions: Gestions): Promise<Gestions> {
     const query = `
-            INSERT INTO public."gestions" (idUtilisateurs, idNotifications, idEvenements, idStatusGestions) 
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO public."Gestions" (idGestions, idUtilisateurs, idNotifications, idEvenements, idStatusGestions) 
+            VALUES (gen_random_uuid(), $1, $2, $3, $4)
             RETURNING *;
         `;
     const values = [
@@ -28,7 +28,7 @@ class GestionsDao {
 
   async findAll(): Promise<Gestions[]> {
     const query = `
-            SELECT * FROM public."gestions";
+            SELECT * FROM public."Gestions";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -42,7 +42,7 @@ class GestionsDao {
 
   async findById(id: number): Promise<Gestions> {
     const query = `
-            SELECT * FROM public."gestions" WHERE idGestions = $1;
+            SELECT * FROM public."Gestions" WHERE idGestions = $1;
         `;
     const values = [id];
     try {
@@ -57,7 +57,7 @@ class GestionsDao {
 
   async updateGestions(gestions: Gestions): Promise<Gestions> {
     const query = `
-            UPDATE public."gestions"
+            UPDATE public."Gestions"
             SET idUtilisateurs = $1, idNotifications = $2, idEvenements = $3, idStatusGestions = $4
             WHERE idGestions = $5
             RETURNING *;
@@ -81,7 +81,7 @@ class GestionsDao {
 
   async deleteGestions(id: number): Promise<void> {
     const query = `
-            DELETE FROM public."gestions"
+            DELETE FROM public."Gestions"
             WHERE idGestions = $1;
         `;
     const values = [id];

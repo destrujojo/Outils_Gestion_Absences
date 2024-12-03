@@ -20,6 +20,8 @@ const port = 5000;
 // Autoriser les requêtes provenant de n'importe quelle origine (CORS)
 app.use(cors());
 
+app.use(express.json());
+
 // Définir un endpoint qui répond à l'appel du bouton React
 app.get("/bonjour", (req, res) => {
   console.log("Bonjour dans le terminal !");

@@ -7,8 +7,8 @@ class StatusGestionsDao {
     statusGestions: StatusGestions
   ): Promise<StatusGestions> {
     const query = `
-            INSERT INTO public."statusGestions" (status) 
-            VALUES ($1)
+            INSERT INTO public."StatusGestions" (idStatusGestion, status) 
+            VALUES (gen_random_uuid(), $1)
             RETURNING *;
         `;
     const values = [statusGestions.statusGestions];
@@ -25,7 +25,7 @@ class StatusGestionsDao {
 
   async findAll(): Promise<StatusGestions[]> {
     const query = `
-            SELECT * FROM public."statusGestions";
+            SELECT * FROM public."StatusGestions";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -39,7 +39,7 @@ class StatusGestionsDao {
 
   async findById(id: number): Promise<StatusGestions> {
     const query = `
-            SELECT * FROM public."statusGestions" WHERE idStatusGestions = $1;
+            SELECT * FROM public."StatusGestions" WHERE idStatusGestions = $1;
         `;
     const values = [id];
     try {
@@ -56,7 +56,7 @@ class StatusGestionsDao {
     statusGestions: StatusGestions
   ): Promise<StatusGestions> {
     const query = `
-            UPDATE public."statusGestions"
+            UPDATE public."StatusGestions"
             SET status = $1
             WHERE idStatusGestions = $2
             RETURNING *;
@@ -78,7 +78,7 @@ class StatusGestionsDao {
 
   async deleteStatusGestions(id: number): Promise<StatusGestions> {
     const query = `
-            DELETE FROM public."statusGestions"
+            DELETE FROM public."StatusGestions"
             WHERE idStatusGestions = $1
             RETURNING *;
         `;

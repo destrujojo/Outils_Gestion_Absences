@@ -5,8 +5,8 @@ import Roles from "../Models/RolesModels";
 class RolesDao {
   async createRoles(roles: Roles): Promise<Roles> {
     const query = `
-            INSERT INTO public."roles" (role) 
-            VALUES ($1)
+            INSERT INTO public."Roles" (idRoles, roles) 
+            VALUES (gen_random_uuid(), $1)
             RETURNING *;
         `;
     const values = [roles.roles];
@@ -21,7 +21,7 @@ class RolesDao {
 
   async findAll(): Promise<Roles[]> {
     const query = `
-            SELECT * FROM public."roles";
+            SELECT * FROM public."Roles";
         `;
     try {
       const result: QueryResult = await pool.query(query);
@@ -35,7 +35,7 @@ class RolesDao {
 
   async findById(id: number): Promise<Roles> {
     const query = `
-            SELECT * FROM public."roles" WHERE idRoles = $1;
+            SELECT * FROM public."Roles" WHERE idRoles = $1;
         `;
     const values = [id];
     try {
@@ -50,8 +50,8 @@ class RolesDao {
 
   async updateRoles(roles: Roles): Promise<Roles> {
     const query = `
-            UPDATE public."roles"
-            SET role = $1
+            UPDATE public."Roles"
+            SET roles = $1
             WHERE idRoles = $2
             RETURNING *;
         `;
@@ -68,7 +68,7 @@ class RolesDao {
 
   async deleteRoles(id: number): Promise<Roles> {
     const query = `
-            DELETE FROM public."roles"
+            DELETE FROM public."Roles"
             WHERE idRoles = $1
             RETURNING *;
         `;
