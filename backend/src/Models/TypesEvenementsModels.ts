@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface TypesEvenements {
-  idTypesEvenements: number;
+  idTypesEvenements: UUID;
   typesEvenements: string;
 }
 

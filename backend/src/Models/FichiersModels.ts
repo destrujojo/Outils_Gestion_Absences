@@ -1,7 +1,9 @@
+import { UUID } from "crypto";
+
 export interface Fichiers {
-  idFichiers: number;
-  idEvenements: number;
-  idFormatsFichiers: number;
+  idFichiers: UUID;
+  idEvenements: UUID;
+  idFormatsFichiers: UUID;
   chemin: string;
 }
 

@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface StatusGestions {
-  idStatusGestions: number;
+  idStatusGestions: UUID;
   statusGestions: string;
 }
 

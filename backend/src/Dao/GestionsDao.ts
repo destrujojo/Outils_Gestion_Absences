@@ -78,6 +78,21 @@ class GestionsDao {
       );
     }
   }
+
+  async deleteGestions(id: number): Promise<void> {
+    const query = `
+            DELETE FROM public."gestions"
+            WHERE idGestions = $1;
+        `;
+    const values = [id];
+    try {
+      await pool.query(query, values);
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la suppression de la gestion: ${error.message}`
+      );
+    }
+  }
 }
 
-export default GestionsDao;
+export default new GestionsDao();

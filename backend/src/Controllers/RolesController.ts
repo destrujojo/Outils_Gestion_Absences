@@ -31,6 +31,26 @@ class RolesController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  async updateRole(req: Request, res: Response) {
+    const role = new Role(req.body);
+    try {
+      const updateRole = await RolesDao.updateRoles(role);
+      res.status(200).json(updateRole);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async deleteRole(req: Request, res: Response) {
+    const id = parseInt(req.params.id);
+    try {
+      await RolesDao.deleteRoles(id);
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
 
 export default new RolesController();

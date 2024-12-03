@@ -1,6 +1,8 @@
+import { UUID } from "crypto";
+
 export interface Evenements {
-  idEvenements: number;
-  idTypesEvenements: number;
+  idEvenements: UUID;
+  idTypesEvenements: UUID;
   commentaire: string;
   dateDebut: Date;
   dateFin: Date;

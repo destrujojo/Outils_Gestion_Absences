@@ -31,4 +31,26 @@ class ClassesController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  async updateClasse(req: Request, res: Response) {
+    const classe = new Classe(req.body);
+    try {
+      const updateClasse = await ClassesDao.updateClasses(classe);
+      res.status(200).json(updateClasse);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async deleteClasse(req: Request, res: Response) {
+    const id = parseInt(req.params.id);
+    try {
+      await ClassesDao.deleteClasses(id);
+      res.status(204).end();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
+
+export default new ClassesController();

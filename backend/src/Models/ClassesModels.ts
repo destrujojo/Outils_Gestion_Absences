@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface Classes {
-  idClasses: number;
+  idClasses: UUID;
   classes: string;
 }
 

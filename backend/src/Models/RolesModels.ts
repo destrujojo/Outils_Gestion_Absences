@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface Roles {
-  idRoles: number;
+  idRoles: UUID;
   roles: string;
 }
 

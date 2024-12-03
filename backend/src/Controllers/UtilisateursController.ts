@@ -34,6 +34,16 @@ class UtilisateursController {
     }
   }
 
+  async findByEmail(req: Request, res: Response) {
+    const email = req.params.email;
+    try {
+      const utilisateur = await UtilisateursDao.findByMail(email);
+      res.status(200).json(utilisateur);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async updateUtilisateur(req: Request, res: Response) {
     const utilisateur = new Utilisateur(req.body);
     try {

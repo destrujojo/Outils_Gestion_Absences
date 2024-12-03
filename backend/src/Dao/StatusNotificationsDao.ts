@@ -1,9 +1,9 @@
 import { QueryResult } from "pg";
 import pool from "../Db/Db";
-import StatusNotification from "../Models/StatusNotificationModels";
+import StatusNotification from "../Models/StatusNotificationsModels";
 
 class StatusNotificationDao {
-  async createStatusNotification(
+  async createStatusNotifications(
     statusNotification: StatusNotification
   ): Promise<StatusNotification> {
     const query = `
@@ -52,7 +52,7 @@ class StatusNotificationDao {
     }
   }
 
-  async updateStatusNotification(
+  async updateStatusNotifications(
     statusNotification: StatusNotification
   ): Promise<StatusNotification> {
     const query = `
@@ -76,7 +76,7 @@ class StatusNotificationDao {
     }
   }
 
-  async deleteStatusNotification(id: number): Promise<StatusNotification> {
+  async deleteStatusNotifications(id: number): Promise<StatusNotification> {
     const query = `
             DELETE FROM public."statusNotification" WHERE idStatusNotification = $1
             RETURNING *;

@@ -1,17 +1,21 @@
 import { UUID } from "crypto";
 
-const { v4: uuidv4 } = require("uuid");
-
 export interface Utilisateurs {
   idUtilisateurs: UUID;
-  idRoles: number;
-  idClasses: number;
+  idRoles: UUID;
+  idClasses: UUID;
   nom: string;
   prenom: string;
   mail: string;
+  mdp: string;
   resetMdp: boolean;
   codeUnique: string;
-  mdp: string;
+  nbRetards: number;
+  nbAbsences: number;
+  tempsTotRetards: number;
+  tempsTotAbsences: number;
+  semestreRetardabsenses: string;
+  nbEssais: number;
 }
 
 export default Utilisateurs;

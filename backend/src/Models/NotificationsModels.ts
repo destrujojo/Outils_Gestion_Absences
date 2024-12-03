@@ -1,6 +1,8 @@
+import { UUID } from "crypto";
+
 export interface Notifications {
-  idNotifications: number;
-  idStatusNotifications: number;
+  idNotifications: UUID;
+  idStatusNotifications: UUID;
   message: string;
 }
 

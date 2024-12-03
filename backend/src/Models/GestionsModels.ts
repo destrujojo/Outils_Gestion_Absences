@@ -1,11 +1,11 @@
 import { UUID } from "crypto";
 
 export interface Gestions {
-  idGestions: number;
+  idGestions: UUID;
   idUtilisateurs: UUID;
-  idNotifications: number;
-  idEvenements: number;
-  idStatusGestions: number;
+  idNotifications: UUID;
+  idEvenements: UUID;
+  idStatusGestions: UUID;
 }
 
 export default Gestions;

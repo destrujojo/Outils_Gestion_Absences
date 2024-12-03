@@ -94,4 +94,4 @@ class NotificationsDao {
   }
 }
 
-export default NotificationsDao;
+export default new NotificationsDao();
