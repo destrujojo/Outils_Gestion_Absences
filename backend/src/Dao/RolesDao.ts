@@ -1,6 +1,7 @@
 import { QueryResult } from "pg";
 import pool from "../Db/Db";
 import Roles from "../Models/RolesModels";
+import { UUID } from "crypto";
 
 class RolesDao {
   async createRoles(roles: Roles): Promise<Roles> {
@@ -33,9 +34,9 @@ class RolesDao {
     }
   }
 
-  async findById(id: number): Promise<Roles> {
+  async findById(id: UUID): Promise<Roles> {
     const query = `
-            SELECT * FROM public."Roles" WHERE idRoles = $1;
+            SELECT * FROM public."Roles" WHERE "idRoles" = $1;
         `;
     const values = [id];
     try {
@@ -48,11 +49,26 @@ class RolesDao {
     }
   }
 
+  async findIdByRoles(roles: string): Promise<UUID> {
+    const query = `
+            SELECT "idRoles" FROM public."Roles" WHERE "roles" = $1;
+        `;
+    const values = [roles];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0].idRoles;
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération de l'id du rôle: ${error.message}`
+      );
+    }
+  }
+
   async updateRoles(roles: Roles): Promise<Roles> {
     const query = `
             UPDATE public."Roles"
-            SET roles = $1
-            WHERE idRoles = $2
+            SET "roles" = $1
+            WHERE "idRoles" = $2
             RETURNING *;
         `;
     const values = [roles.roles, roles.idRoles];
@@ -66,10 +82,10 @@ class RolesDao {
     }
   }
 
-  async deleteRoles(id: number): Promise<Roles> {
+  async deleteRoles(id: UUID): Promise<Roles> {
     const query = `
             DELETE FROM public."Roles"
-            WHERE idRoles = $1
+            WHERE "idRoles" = $1
             RETURNING *;
         `;
     const values = [id];

@@ -1,6 +1,7 @@
 import { QueryResult } from "pg";
 import pool from "../Db/Db";
 import Classes from "../Models/ClassesModels";
+import { UUID } from "crypto";
 
 class ClassesDao {
   async createClasses(classes: Classes): Promise<Classes> {
@@ -37,7 +38,7 @@ class ClassesDao {
 
   async findById(id: number): Promise<Classes> {
     const query = `
-            SELECT * FROM public."Classes" WHERE idClasses = $1;
+            SELECT * FROM public."Classes" WHERE "idClasses" = $1;
         `;
     const values = [id];
     try {
@@ -50,11 +51,26 @@ class ClassesDao {
     }
   }
 
+  async findIdByClasses(classes: string): Promise<UUID> {
+    const query = `
+            SELECT "idClasses" FROM public."Classes" WHERE "classes" = $1;
+        `;
+    const values = [classes];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0].idClasses;
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération de l'id de la classe: ${error.message}`
+      );
+    }
+  }
+
   async updateClasses(classes: Classes): Promise<Classes> {
     const query = `
             UPDATE public."Classes"
-            SET classes = $1
-            WHERE idClasses = $2
+            SET "classes" = $1
+            WHERE "idClasses" = $2
             RETURNING *;
         `;
     const values = [classes.classes, classes.idClasses];
@@ -71,7 +87,7 @@ class ClassesDao {
   async deleteClasses(id: number): Promise<Classes> {
     const query = `
             DELETE FROM public."Classes"
-            WHERE idClasses = $1
+            WHERE "idClasses" = $1
             RETURNING *;
         `;
     const values = [id];

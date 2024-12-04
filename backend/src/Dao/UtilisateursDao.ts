@@ -16,10 +16,10 @@ class UtilisateursDao {
               "resetMdp",
               "codeUnique",
               "nbRetards",
-              "nbAbsences",
+              "nbAbsenses",
               "tempsTotRetards",
-              "tempsTotAbsences",
-              "semestreRetardabsenses",
+              "tempsTotAbsenses",
+              "semestreRetardsAbsenses",
               "nbEssais"
             )
             VALUES (
@@ -84,7 +84,7 @@ class UtilisateursDao {
 
   async findById(id: number): Promise<Utilisateurs> {
     const query = `
-            SELECT * FROM public."Utilisateurs" WHERE idUtilisateurs = $1;
+            SELECT * FROM public."Utilisateurs" WHERE "idUtilisateurs" = $1;
         `;
     const values = [id];
     try {
@@ -99,7 +99,7 @@ class UtilisateursDao {
 
   async findByMail(mail: string): Promise<Utilisateurs> {
     const query = `
-            SELECT * FROM public."Utilisateurs" WHERE mail = $1;
+            SELECT * FROM public."Utilisateurs" WHERE "mail" = $1;
         `;
     const values = [mail];
     try {
@@ -115,21 +115,21 @@ class UtilisateursDao {
   async updateUtilisateurs(utilisateurs: Utilisateurs): Promise<Utilisateurs> {
     const query = `
             UPDATE public."Utilisateurs"
-            SET idRoles = $1,
-                idClasses = $2,
-                nom = $3,
-                prenom = $4,
-                mail = $5,
-                mdp = $6,
-                resetMdp = $7,
-                codeUnique = $8,
-                nbRetards = $9,
-                nbAbsences = $10,
-                tempsTotRetards = $11,
-                tempsTotAbsences = $12,
-                semestreRetardAbsenses = $13,
-                nbEssais = $14
-            WHERE idUtilisateurs = $15
+            SET "idRoles" = $1,
+                "idClasses" = $2,
+                "nom" = $3,
+                "prenom" = $4,
+                "mail" = $5,
+                "mdp" = $6,
+                "resetMdp" = $7,
+                "codeUnique" = $8,
+                "nbRetards" = $9,
+                "nbAbsences" = $10,
+                "tempsTotRetards" = $11,
+                "tempsTotAbsences" = $12,
+                "semestreRetardAbsenses" = $13,
+                "nbEssais" = $14
+            WHERE "idUtilisateurs" = $15
             RETURNING *;
         `;
     const values = [
@@ -161,7 +161,7 @@ class UtilisateursDao {
 
   async deleteUtilisateurs(id: number): Promise<Utilisateurs> {
     const query = `
-            DELETE FROM public."Utilisateurs" WHERE idUtilisateurs = $1
+            DELETE FROM public."Utilisateurs" WHERE "idUtilisateurs" = $1
             RETURNING *;
         `;
     const values = [id];

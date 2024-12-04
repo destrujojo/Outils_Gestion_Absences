@@ -39,7 +39,7 @@ class TypesEvenementsDao {
 
   async findById(id: number): Promise<TypesEvenements> {
     const query = `
-            SELECT * FROM public."TypesEvenements" WHERE idTypesEvenements = $1;
+            SELECT * FROM public."TypesEvenements" WHERE "idTypesEvenements" = $1;
         `;
     const values = [id];
     try {
@@ -57,8 +57,8 @@ class TypesEvenementsDao {
   ): Promise<TypesEvenements> {
     const query = `
             UPDATE public."TypesEvenements"
-            SET typesEvenements = $1
-            WHERE idTypesEvenements = $2
+            SET "typesEvenements" = $1
+            WHERE "idTypesEvenements" = $2
             RETURNING *;
         `;
     const values = [
@@ -77,7 +77,7 @@ class TypesEvenementsDao {
 
   async deleteTypesEvenements(id: number): Promise<TypesEvenements> {
     const query = `
-            DELETE FROM public."TypesEvenements" WHERE idTypesEvenements = $1
+            DELETE FROM public."TypesEvenements" WHERE "idTypesEvenements" = $1
             RETURNING *;
         `;
     const values = [id];

@@ -23,7 +23,7 @@ class RolesController {
   }
 
   async findById(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
+    const id = req.body.id;
     try {
       const role = await RolesDao.findById(id);
       res.status(200).json(role);
@@ -43,7 +43,7 @@ class RolesController {
   }
 
   async deleteRole(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
+    const id = req.body.id;
     try {
       await RolesDao.deleteRoles(id);
       res.status(204).end();

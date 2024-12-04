@@ -39,7 +39,7 @@ class StatusGestionsDao {
 
   async findById(id: number): Promise<StatusGestions> {
     const query = `
-            SELECT * FROM public."StatusGestions" WHERE idStatusGestions = $1;
+            SELECT * FROM public."StatusGestions" WHERE "idStatusGestions" = $1;
         `;
     const values = [id];
     try {
@@ -57,8 +57,8 @@ class StatusGestionsDao {
   ): Promise<StatusGestions> {
     const query = `
             UPDATE public."StatusGestions"
-            SET status = $1
-            WHERE idStatusGestions = $2
+            SET "status" = $1
+            WHERE "idStatusGestions" = $2
             RETURNING *;
         `;
     const values = [
@@ -79,7 +79,7 @@ class StatusGestionsDao {
   async deleteStatusGestions(id: number): Promise<StatusGestions> {
     const query = `
             DELETE FROM public."StatusGestions"
-            WHERE idStatusGestions = $1
+            WHERE "idStatusGestions" = $1
             RETURNING *;
         `;
     const values = [id];

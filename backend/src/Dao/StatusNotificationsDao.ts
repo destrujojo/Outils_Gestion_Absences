@@ -39,7 +39,7 @@ class StatusNotificationDao {
 
   async findById(id: number): Promise<StatusNotification> {
     const query = `
-            SELECT * FROM public."StatusNotifications" WHERE idStatusNotifications = $1;
+            SELECT * FROM public."StatusNotifications" WHERE "idStatusNotifications" = $1;
         `;
     const values = [id];
     try {
@@ -57,8 +57,8 @@ class StatusNotificationDao {
   ): Promise<StatusNotification> {
     const query = `
             UPDATE public."StatusNotifications"
-            SET status = $1
-            WHERE idStatusNotifications = $2
+            SET "status" = $1
+            WHERE "idStatusNotifications" = $2
             RETURNING *;
         `;
     const values = [
@@ -78,7 +78,7 @@ class StatusNotificationDao {
 
   async deleteStatusNotifications(id: number): Promise<StatusNotification> {
     const query = `
-            DELETE FROM public."StatusNotifications" WHERE idStatusNotifications = $1
+            DELETE FROM public."StatusNotifications" WHERE "idStatusNotifications" = $1
             RETURNING *;
         `;
     const values = [id];

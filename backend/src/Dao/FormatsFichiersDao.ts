@@ -39,7 +39,7 @@ class FormatsFichiersDao {
 
   async findById(id: number): Promise<FormatsFichiers> {
     const query = `
-            SELECT * FROM public."FormatsFichiers" WHERE idFormatsFichiers = $1;
+            SELECT * FROM public."FormatsFichiers" WHERE "idFormatsFichiers" = $1;
         `;
     const values = [id];
     try {
@@ -57,8 +57,8 @@ class FormatsFichiersDao {
   ): Promise<FormatsFichiers> {
     const query = `
             UPDATE public."FormatsFichiers"
-            SET format = $1
-            WHERE idFormatsFichiers = $2
+            SET "formatsFichiers" = $1
+            WHERE "idFormatsFichiers" = $2
             RETURNING *;
         `;
     const values = [
@@ -77,7 +77,7 @@ class FormatsFichiersDao {
 
   async deleteFormatsFichiers(id: number): Promise<FormatsFichiers> {
     const query = `
-            DELETE FROM public."FormatsFichiers" WHERE idFormatsFichiers = $1
+            DELETE FROM public."FormatsFichiers" WHERE "idFormatsFichiers" = $1
             RETURNING *;
         `;
     const values = [id];

@@ -1,15 +1,29 @@
 import { Request, Response } from "express";
 import UtilisateursDao from "../Dao/UtilisateursDao";
+import UtilisateursServices from "../Services/UtilisateursServices";
 const Utilisateur = require("../Models/UtilisateursModels");
 
 class UtilisateursController {
   async createUtilisateur(req: Request, res: Response) {
-    const utilisateurs = new Utilisateur(req.body);
+    const { classes, ...otherField } = req.body;
+    const utilisateur = { ...otherField };
+    console.log(req.body);
     try {
-      const newUtilisateur = await UtilisateursDao.createUtilisateurs(
-        utilisateurs
+      const newUtilisateur = await UtilisateursServices.createUtilisateurs(
+        utilisateur,
+        classes
       );
       res.status(201).json(newUtilisateur);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async loginUtilisateurs(req: Request, res: Response) {
+    const { mail, mdp } = req.body;
+    try {
+      const login = await UtilisateursServices.loginUtilisateurs({ mail, mdp });
+      res.status(200).json(login);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }

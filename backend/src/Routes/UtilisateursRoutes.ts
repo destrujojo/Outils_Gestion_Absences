@@ -22,4 +22,9 @@ routerUtilisateurs.delete(
   UtilisateursController.deleteUtilisateur
 );
 
+routerUtilisateurs.post(
+  "/utilisateurLogin",
+  UtilisateursController.loginUtilisateurs
+);
+
 export default routerUtilisateurs;

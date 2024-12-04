@@ -42,7 +42,7 @@ class GestionsDao {
 
   async findById(id: number): Promise<Gestions> {
     const query = `
-            SELECT * FROM public."Gestions" WHERE idGestions = $1;
+            SELECT * FROM public."Gestions" WHERE "idGestions" = $1;
         `;
     const values = [id];
     try {
@@ -58,8 +58,8 @@ class GestionsDao {
   async updateGestions(gestions: Gestions): Promise<Gestions> {
     const query = `
             UPDATE public."Gestions"
-            SET idUtilisateurs = $1, idNotifications = $2, idEvenements = $3, idStatusGestions = $4
-            WHERE idGestions = $5
+            SET "idUtilisateurs" = $1, "idNotifications" = $2, "idEvenements" = $3, "idStatusGestions" = $4
+            WHERE "idGestions" = $5
             RETURNING *;
         `;
     const values = [
@@ -82,7 +82,7 @@ class GestionsDao {
   async deleteGestions(id: number): Promise<void> {
     const query = `
             DELETE FROM public."Gestions"
-            WHERE idGestions = $1;
+            WHERE "idGestions" = $1;
         `;
     const values = [id];
     try {
