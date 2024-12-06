@@ -10,12 +10,20 @@ export default function Login() {
     loading,
     register,
     registrationError,
+    verifMail,
+    generateCode,
+    updateMdp,
+    resetCode,
+    verifCode,
   } = useAuth();
   const navigate = useNavigate();
 
-  const [isRegistering, setIsRegistering] = useState(false);
+  // const [isRegistering, setIsRegistering] = useState(false);
+  const [isReset, setIsReset] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [codeValide, setCodeValide] = useState(false);
+  const [isVerifMail, setIsVerifMail] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +31,7 @@ export default function Login() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [classes, setClasses] = useState("");
+  const [code, setCode] = useState("");
 
   const [localError, setLocalError] = useState("");
 
@@ -31,17 +40,17 @@ export default function Login() {
     return email.endsWith("@student.junia.com") || email.endsWith("@junia.com");
   };
 
-  useEffect(() => {
-    // Réinitialiser localError lorsque l'on change de mode
-    setLocalError("");
+  // useEffect(() => {
+  //   // Réinitialiser localError lorsque l'on change de mode
+  //   setLocalError("");
 
-    // Mettre à jour localError en fonction de l'état actuel
-    if (isRegistering && registrationError) {
-      setLocalError(registrationError);
-    } else if (!isRegistering && apiError) {
-      setLocalError(apiError);
-    }
-  }, [apiError, registrationError, isRegistering]);
+  //   // Mettre à jour localError en fonction de l'état actuel
+  //   if (isRegistering && registrationError) {
+  //     setLocalError(registrationError);
+  //   } else if (!isRegistering && apiError) {
+  //     setLocalError(apiError);
+  //   }
+  // }, [apiError, registrationError, isRegistering]);
 
   const resetData = () => {
     setLocalError("");
@@ -50,151 +59,235 @@ export default function Login() {
     setFirstName("");
     setLastName("");
     setClasses("");
+    setCode("");
+    setEmail("");
   };
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLocalError("");
 
-    if (isRegistering) {
-      if (!isValidEmail(email)) {
-        setLocalError(
-          "L'email doit se terminer par @ext.junia.com ou @junia.com"
-        );
-        return;
-      }
+    const success = await login(email, password);
+    if (!success) return;
+    resetData();
+    navigate("/");
+  };
 
-      if (password === confirmPassword) {
-        const success = await register(
-          firstName,
-          lastName,
-          email,
-          password,
-          classes
-        );
-        if (!success) return;
-        resetData();
-        navigate("/");
-      } else {
-        setLocalError("Les mots de passe ne correspondent pas");
-      }
-    } else {
-      const success = await login(email, password);
-      if (!success) return;
+  const handleReset = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLocalError("");
+
+    if (password === confirmPassword) {
+      await updateMdp(email, password);
       resetData();
-      navigate("/");
+      setIsReset(false);
+      setCodeValide(false);
+      setIsVerifMail(false);
+      navigate("/login");
+    } else {
+      setLocalError("Les mots de passe ne correspondent pas");
+    }
+  };
+
+  const verifMailFunction = async (email: string) => {
+    setLocalError("");
+    try {
+      const result = await verifMail(email);
+      if (!result) {
+        setLocalError(
+          "L'email n'existe pas, merci de vous rapprocher de l'admin"
+        );
+        setIsVerifMail(false);
+        return false;
+      } else {
+        setIsVerifMail(true);
+        await generateCode(email);
+        return true;
+      }
+    } catch (err) {
+      setLocalError(
+        "L'email n'existe pas, merci de vous rapprocher de l'admin"
+      );
+      return false;
+    }
+  };
+
+  const verifCodeFonction = async (code: string) => {
+    setLocalError("");
+    try {
+      const result = await verifCode(email, code);
+      if (!result) {
+        setLocalError("Code invalide, merci de générer un nouveau code");
+        await resetCode(email);
+        return false;
+      }
+      setCodeValide(true);
+      await resetCode(email);
+      return true;
+    } catch (err) {
+      await resetCode(email);
+      setLocalError("Code invalide, merci de générer un nouveau code");
+      return false;
     }
   };
 
   return (
     <div className="flex min-h-screen flex-grow items-center justify-center pt-24 bg-lightOrange">
       <div className="w-full max-w-md bg-white p-8 mb-14 rounded-lg shadow-lg">
-        <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          {isRegistering ? "Inscription" : "Connexion"}
-        </h2>
-        <form className="space-y-6 mt-6" onSubmit={handleLogin}>
-          {isRegistering && (
+        {isReset ? (
+          codeValide ? (
             <>
-              <InputForm
-                id="first-name"
-                label="Prénom"
-                type="text"
-                required={true}
-                autoComplete="first-name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <InputForm
-                id="last-name"
-                label="Nom"
-                type="text"
-                required={true}
-                autoComplete="last-name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-
-              <InputForm
-                id="classes"
-                label="Classes"
-                type="text"
-                required={true}
-                autoComplete="classes"
-                value={classes}
-                onChange={(e) => setClasses(e.target.value)}
-              />
+              <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                Reset mot de passe
+              </h2>
+              <form className="space-y-6 mt-6" onSubmit={handleReset}>
+                <InputForm
+                  id="password"
+                  label="Mot de passe"
+                  type={showPassword ? "text" : "password"}
+                  required={true}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  showEye={true}
+                  toggleEye={() => setShowPassword(!showPassword)}
+                />
+                <InputForm
+                  id="confirm-password"
+                  label="Confirmation du mot de passe"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required={true}
+                  autoComplete="current-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  showEye={true}
+                  toggleEye={() => setShowConfirmPassword(!showConfirmPassword)}
+                />
+                <div>
+                  <button
+                    type="submit"
+                    className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    disabled={loading}
+                  >
+                    Valider mot de passe
+                  </button>
+                </div>
+                {localError && (
+                  <div className="mt-2 text-red-600 text-sm">{localError}</div>
+                )}
+              </form>
             </>
-          )}
+          ) : (
+            <>
+              <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                Reset mot de passe
+              </h2>
+              <form className="space-y-6 mt-6">
+                <InputForm
+                  id="email"
+                  label="Email"
+                  type="email"
+                  required={true}
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <div>
+                  <button
+                    className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    onClick={() => {
+                      verifMailFunction(email);
+                    }}
+                  >
+                    {isVerifMail ? "Mail valide" : "Vérifier mail"}
+                  </button>
+                </div>
+                {isVerifMail && (
+                  <>
+                    <InputForm
+                      id="code"
+                      label="Code"
+                      type="text"
+                      required={false}
+                      autoComplete="code"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                    />
+                    <div>
+                      <button
+                        className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        onClick={() => {
+                          verifCodeFonction(code);
+                        }}
+                      >
+                        Vérifier code
+                      </button>
+                    </div>
+                  </>
+                )}
+                {localError && (
+                  <div className="mt-2 text-red-600 text-sm">{localError}</div>
+                )}
+              </form>
+            </>
+          )
+        ) : (
+          <>
+            <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+              Connexion
+            </h2>
+            <form className="space-y-6 mt-6" onSubmit={handleLogin}>
+              <InputForm
+                id="email"
+                label="Email"
+                type="email"
+                required={true}
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
 
-          <InputForm
-            id="email"
-            label="Email"
-            type="email"
-            required={true}
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+              <InputForm
+                id="password"
+                label="Mot de passe"
+                type={showPassword ? "text" : "password"}
+                required={true}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                showEye={true}
+                toggleEye={() => setShowPassword(!showPassword)}
+              />
 
-          <InputForm
-            id="password"
-            label="Mot de passe"
-            type={showPassword ? "text" : "password"}
-            required={true}
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            showEye={true}
-            toggleEye={() => setShowPassword(!showPassword)}
-          />
+              {/* Afficher les erreurs */}
+              {localError && (
+                <div className="mt-2 text-red-600 text-sm">{localError}</div>
+              )}
 
-          {isRegistering && (
-            <InputForm
-              id="confirm-password"
-              label="Confirmation du mot de passe"
-              type={showConfirmPassword ? "text" : "password"}
-              required={true}
-              autoComplete="current-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              showEye={true}
-              toggleEye={() => setShowConfirmPassword(!showConfirmPassword)}
-            />
-          )}
-
-          {/* Afficher les erreurs */}
-          {localError && (
-            <div className="mt-2 text-red-600 text-sm">{localError}</div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              disabled={loading}
-            >
-              {loading
-                ? "Chargement..."
-                : isRegistering
-                ? "S'inscrire"
-                : "Se connecter"}
-              Se connecter
-            </button>
-          </div>
-        </form>
+              <div>
+                <button
+                  type="submit"
+                  className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  disabled={loading}
+                >
+                  {loading ? "Chargement..." : "Se connecter"}
+                </button>
+              </div>
+            </form>
+          </>
+        )}
         <p className="mt-10 text-center text-sm text-gray-500">
-          {isRegistering
-            ? "Vous avez déjà un compte ?"
-            : "Vous n’avez pas de compte ?"}{" "}
+          {isReset ? "Connectez-vous ?" : "Reset votre mot de passe ?"}{" "}
           <a
             href="#"
             onClick={() => {
-              setIsRegistering(!isRegistering);
+              // setIsRegistering(!isRegistering);
+              setIsReset(!isReset);
               setLocalError("");
             }}
             className="font-semibold leading-6 text-darkPurple hover:text-orange"
           >
-            {isRegistering ? "Se connecter" : "S'inscrire"}
+            {isReset ? "Se connecter" : "Reset"}
           </a>
         </p>
       </div>

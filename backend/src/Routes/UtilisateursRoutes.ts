@@ -8,6 +8,11 @@ routerUtilisateurs.get("/utilisateurFindsAll", UtilisateursController.findAll);
 routerUtilisateurs.get("/utilisateurFindsId", UtilisateursController.findById);
 
 routerUtilisateurs.post(
+  "/utilisateurFindsEmail",
+  UtilisateursController.findByEmail
+);
+
+routerUtilisateurs.post(
   "/utilisateurCreate",
   UtilisateursController.createUtilisateur
 );
@@ -15,6 +20,26 @@ routerUtilisateurs.post(
 routerUtilisateurs.put(
   "/utilisateurUpdate",
   UtilisateursController.updateUtilisateur
+);
+
+routerUtilisateurs.post(
+  "/utilisateurUpdateCode",
+  UtilisateursController.generateCode
+);
+
+routerUtilisateurs.post(
+  "/utilisateurVerifCode",
+  UtilisateursController.verifCode
+);
+
+routerUtilisateurs.post(
+  "/utilisateurResetCode",
+  UtilisateursController.resetCode
+);
+
+routerUtilisateurs.post(
+  "/utilisateurUpdateMdp",
+  UtilisateursController.updateMdp
 );
 
 routerUtilisateurs.delete(

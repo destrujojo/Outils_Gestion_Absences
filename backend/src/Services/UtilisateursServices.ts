@@ -4,6 +4,8 @@ import RolesDao from "../Dao/RolesDao";
 import ClassesDao from "../Dao/ClassesDao";
 import { RoleEnum } from "../Enums/RoleEnum";
 import bcrypt from "bcrypt";
+import { Client } from "ssh2";
+const { exec } = require("child_process");
 
 class UtilisateursServices {
   async createUtilisateurs(
@@ -31,9 +33,7 @@ class UtilisateursServices {
     const role: RoleEnum = mail.endsWith("@student.junia.com")
       ? RoleEnum.Etudiant
       : RoleEnum.Admin;
-    console.log(role);
     const idRoles = (await RolesDao.findIdByRoles(role)) || 0;
-    console.log(idRoles);
     const idClasses = (await ClassesDao.findIdByClasses(classes)) || 0;
 
     const mdpHash = await bcrypt.hash(mdp, 10);
@@ -62,9 +62,7 @@ class UtilisateursServices {
     mail: string;
     mdp: string;
   }): Promise<Utilisateurs | null> {
-    console.log(mail, mdp);
     const utilisateur = await UtilisateursDao.findByMail(mail);
-    console.log(utilisateur);
     if (!utilisateur) {
       throw new Error("L'utilisateur n'existe pas");
     }
@@ -75,6 +73,57 @@ class UtilisateursServices {
     }
 
     return utilisateur;
+  }
+
+  async verifMail(mail: string): Promise<Utilisateurs | null> {
+    const utilisateur = UtilisateursDao.findByMail(mail);
+    if (!utilisateur) {
+      throw new Error("L'adresse mail n'existe pas");
+    }
+    return utilisateur;
+  }
+
+  async generateCode(mail: string): Promise<string> {
+    const code = Math.random().toString(36).substring(2, 8);
+    await UtilisateursDao.updateCode(mail, code);
+    const commande = `echo "${code}" | mail -s "Code de réinitialisation" ${mail}`;
+    // exec(commande);
+    const ssh = new Client();
+    ssh.connect({
+      host: "10.40.150.2",
+      port: 2222,
+      username: "paj",
+      password: "Junia_AP5",
+    });
+    ssh.on("ready", () => {
+      ssh.exec(commande, (err, stream) => {
+        if (err) throw err;
+        stream
+          .on("close", (code: number, signal: string | null) => {
+            ssh.end(); // Fermez la connexion SSH
+          })
+          .on("data", (data: Buffer) => {
+            console.log("Sortie stdout :", data.toString());
+          })
+          .stderr.on("data", (data: Buffer) => {
+            console.error("Sortie stderr :", data.toString());
+          });
+      });
+    });
+    return code;
+  }
+
+  async verifyCode(mail: string, code: string): Promise<Utilisateurs> {
+    return await UtilisateursDao.verifyCode(mail, code);
+  }
+
+  async resetCode(mail: string): Promise<Utilisateurs> {
+    return await UtilisateursDao.resetCode(mail);
+  }
+
+  async updateMdp(mail: string, mdp: string): Promise<Utilisateurs> {
+    const mdpHash = await bcrypt.hash(mdp, 10);
+    return await UtilisateursDao.updateMdp(mail, mdpHash);
   }
 }
 

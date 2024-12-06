@@ -7,7 +7,6 @@ class UtilisateursController {
   async createUtilisateur(req: Request, res: Response) {
     const { classes, ...otherField } = req.body;
     const utilisateur = { ...otherField };
-    console.log(req.body);
     try {
       const newUtilisateur = await UtilisateursServices.createUtilisateurs(
         utilisateur,
@@ -49,12 +48,14 @@ class UtilisateursController {
   }
 
   async findByEmail(req: Request, res: Response) {
-    const email = req.params.email;
+    const email = req.body.mail;
     try {
       const utilisateur = await UtilisateursDao.findByMail(email);
       res.status(200).json(utilisateur);
+      // return true;
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+      // return false;
     }
   }
 
@@ -75,6 +76,46 @@ class UtilisateursController {
     try {
       await UtilisateursDao.deleteUtilisateurs(id);
       res.status(204).end();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async generateCode(req: Request, res: Response) {
+    const email = req.body.email;
+    try {
+      const code = await UtilisateursServices.generateCode(email);
+      res.status(204).json();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async verifCode(req: Request, res: Response) {
+    const { email, code } = req.body;
+    try {
+      const codeResult = await UtilisateursServices.verifyCode(email, code);
+      res.status(200).json(codeResult);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async resetCode(req: Request, res: Response) {
+    const email = req.body.email;
+    try {
+      const code = await UtilisateursServices.resetCode(email);
+      res.status(204).json();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async updateMdp(req: Request, res: Response) {
+    const { email, mdp } = req.body;
+    try {
+      const code = await UtilisateursServices.updateMdp(email, mdp);
+      res.status(204).json();
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
