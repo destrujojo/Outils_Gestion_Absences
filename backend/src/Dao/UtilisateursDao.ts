@@ -163,6 +163,25 @@ class UtilisateursDao {
     }
   }
 
+  async verifMail(mail: string): Promise<Utilisateurs | null> {
+    const query = `
+            SELECT * FROM public."Utilisateurs" WHERE "mail" = $1;
+        `;
+    const values = [mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return null;
+      }
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la vérification de l'adresse mail: ${error.message}`
+      );
+    }
+  }
+
   async verifyCode(mail: string, code: string): Promise<Utilisateurs> {
     const query = `
             SELECT * FROM public."Utilisateurs" WHERE "mail" = $1 AND "codeUnique" = $2;

@@ -20,7 +20,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isVerifMail: boolean;
   user: User | null;
-  verifMailUser: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   verifMail: (email: string) => Promise<boolean>;
   generateCode: (email: string) => Promise<boolean>;
@@ -57,7 +56,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   } = useRegistration();
   const {
     verifMail: verifMailHook,
-    user: userVerifMail,
     loading: verifMailLoading,
     error: verifMailError,
   } = useVerifMail();
@@ -86,8 +84,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const verifMail = async (email: string): Promise<boolean> => {
     try {
-      await verifMailHook(email);
-      if (verifMailError === null) {
+      const resultVerif = await verifMailHook(email);
+
+      if (resultVerif) {
         setIsVerifMail(true);
         return true;
       } else {
@@ -169,7 +168,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated,
         isVerifMail,
         user,
-        verifMailUser: userVerifMail,
         generateCode,
         resetCode,
         updateMdp,

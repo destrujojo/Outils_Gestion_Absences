@@ -75,12 +75,13 @@ class UtilisateursServices {
     return utilisateur;
   }
 
-  async verifMail(mail: string): Promise<Utilisateurs | null> {
-    const utilisateur = UtilisateursDao.findByMail(mail);
+  async verifMail(mail: string): Promise<boolean> {
+    const utilisateur = await UtilisateursDao.verifMail(mail);
     if (!utilisateur) {
-      throw new Error("L'adresse mail n'existe pas");
+      return false;
+    } else {
+      return true;
     }
-    return utilisateur;
   }
 
   async generateCode(mail: string): Promise<string> {

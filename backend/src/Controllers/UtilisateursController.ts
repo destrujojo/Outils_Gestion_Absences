@@ -91,6 +91,16 @@ class UtilisateursController {
     }
   }
 
+  async verifMail(req: Request, res: Response) {
+    const { mail } = req.body;
+    try {
+      const codeResult = await UtilisateursServices.verifMail(mail);
+      res.status(200).json(codeResult);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async verifCode(req: Request, res: Response) {
     const { email, code } = req.body;
     try {

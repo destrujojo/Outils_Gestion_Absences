@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { User } from "../auth/AuthContext";
 import { MESSAGE_ERREUR_CONNEXION } from "../constante";
 
 const useVerifMail = () => {
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [dataVerif, setDataVerif] = useState<boolean>(false);
 
   const verifMail = async (mail: string) => {
     setLoading(true);
@@ -13,7 +12,7 @@ const useVerifMail = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/utilisateurs/utilisateurFindsEmail",
+        "http://localhost:5000/api/utilisateurs/utilisateurVerifMail",
         {
           method: "POST",
           headers: {
@@ -23,16 +22,10 @@ const useVerifMail = () => {
         }
       );
 
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || MESSAGE_ERREUR_CONNEXION);
-      }
-
       const data = await response.json();
-      if (data === null) {
-        throw new Error("Utilisateur non trouvé");
-      }
-      setUser(data);
+      setDataVerif(data);
+
+      return data;
     } catch (error) {
       let errorMsg = MESSAGE_ERREUR_CONNEXION;
 
@@ -51,7 +44,7 @@ const useVerifMail = () => {
     }
   };
 
-  return { user, loading, error, verifMail };
+  return { loading, error, verifMail, dataVerif };
 };
 
 export default useVerifMail;

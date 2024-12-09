@@ -6,15 +6,14 @@ import { useAuth } from "./../auth/AuthContext";
 export default function Login() {
   const {
     login,
-    error: apiError,
     loading,
-    register,
-    registrationError,
     verifMail,
     generateCode,
     updateMdp,
     resetCode,
     verifCode,
+    registrationError,
+    error: apiError,
   } = useAuth();
   const navigate = useNavigate();
 
@@ -28,9 +27,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [classes, setClasses] = useState("");
   const [code, setCode] = useState("");
 
   const [localError, setLocalError] = useState("");
@@ -40,25 +36,22 @@ export default function Login() {
     return email.endsWith("@student.junia.com") || email.endsWith("@junia.com");
   };
 
-  // useEffect(() => {
-  //   // Réinitialiser localError lorsque l'on change de mode
-  //   setLocalError("");
+  useEffect(() => {
+    // Réinitialiser localError lorsque l'on change de mode
+    setLocalError("");
 
-  //   // Mettre à jour localError en fonction de l'état actuel
-  //   if (isRegistering && registrationError) {
-  //     setLocalError(registrationError);
-  //   } else if (!isRegistering && apiError) {
-  //     setLocalError(apiError);
-  //   }
-  // }, [apiError, registrationError, isRegistering]);
+    // Mettre à jour localError en fonction de l'état actuel
+    if (isReset && registrationError) {
+      setLocalError(registrationError);
+    } else if (!isReset && apiError) {
+      setLocalError(apiError);
+    }
+  }, [apiError, registrationError, isReset]);
 
   const resetData = () => {
     setLocalError("");
     setPassword("");
     setConfirmPassword("");
-    setFirstName("");
-    setLastName("");
-    setClasses("");
     setCode("");
     setEmail("");
   };
@@ -67,8 +60,16 @@ export default function Login() {
     event.preventDefault();
     setLocalError("");
 
+    if (!isValidEmail(email)) {
+      setLocalError("L'email doit se terminer pas @student.junia.com");
+      return;
+    }
+
     const success = await login(email, password);
-    if (!success) return;
+    if (!success) {
+      setLocalError("Email ou mot de passe incorrect");
+      return;
+    }
     resetData();
     navigate("/");
   };
@@ -91,13 +92,21 @@ export default function Login() {
 
   const verifMailFunction = async (email: string) => {
     setLocalError("");
+    setIsVerifMail(false);
+
+    // if (!isValidEmail(email)) {
+    //   setLocalError(
+    //     "L'email doit se terminer par @student.junia.com ou @junia.com"
+    //   );
+    //   return false;
+    // }
+
     try {
       const result = await verifMail(email);
       if (!result) {
         setLocalError(
           "L'email n'existe pas, merci de vous rapprocher de l'admin"
         );
-        setIsVerifMail(false);
         return false;
       } else {
         setIsVerifMail(true);
@@ -194,6 +203,7 @@ export default function Login() {
                 />
                 <div>
                   <button
+                    type="button"
                     className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={() => {
                       verifMailFunction(email);
@@ -215,6 +225,7 @@ export default function Login() {
                     />
                     <div>
                       <button
+                        type="button"
                         className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         onClick={() => {
                           verifCodeFonction(code);

@@ -28,6 +28,11 @@ routerUtilisateurs.post(
 );
 
 routerUtilisateurs.post(
+  "/utilisateurVerifMail",
+  UtilisateursController.verifMail
+);
+
+routerUtilisateurs.post(
   "/utilisateurVerifCode",
   UtilisateursController.verifCode
 );
