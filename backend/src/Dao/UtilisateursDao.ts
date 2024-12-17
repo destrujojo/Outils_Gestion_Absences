@@ -116,6 +116,35 @@ class UtilisateursDao {
     }
   }
 
+  async findByMailEtudiant(mail: string) {
+    const query = `
+            SELECT uti."nom", 
+              uti."prenom", 
+              uti."mail", 
+              uti."idClasses", 
+              uti."idRoles", 
+              uti."nbRetards", 
+              uti."nbAbsences", 
+              uti."tempsTotRetards", 
+              uti."tempsTotAbsences", 
+              uti."semestreRetardsAbsenses", 
+              uti."nbEssais" 
+            FROM public."Utilisateurs" uti
+              LEFT JOIN public."Roles" rol ON rol."idRoles" = uti."idRoles" 
+            WHERE uti."mail" = $1 
+              AND rol."roles" = 'Etudiant';
+        `;
+    const values = [mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération de l'utilisateur: ${error.message}`
+      );
+    }
+  }
+
   async updateUtilisateurs(utilisateurs: Utilisateurs): Promise<Utilisateurs> {
     const query = `
             UPDATE public."Utilisateurs"

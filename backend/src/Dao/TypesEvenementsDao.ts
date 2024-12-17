@@ -52,6 +52,23 @@ class TypesEvenementsDao {
     }
   }
 
+  async findIdTypesEvenements(
+    typesEvenements: string
+  ): Promise<TypesEvenements> {
+    const query = `
+            SELECT * FROM public."TypesEvenements" WHERE "typesEvenements" = $1;
+        `;
+    const values = [typesEvenements];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du type d'événement: ${error.message}`
+      );
+    }
+  }
+
   async updateTypesEvenements(
     typesEvenements: TypesEvenements
   ): Promise<TypesEvenements> {

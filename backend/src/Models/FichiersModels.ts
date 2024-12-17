@@ -5,6 +5,7 @@ export interface Fichiers {
   idEvenements: UUID;
   idFormatsFichiers: UUID;
   chemin: string;
+  nom: string;
 }
 
 export default Fichiers;

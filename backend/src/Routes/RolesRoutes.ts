@@ -5,7 +5,9 @@ const routerRoles = Router();
 
 routerRoles.get("/roleFindsAll", RolesController.findAll);
 
-routerRoles.get("/roleFindsId/:id", RolesController.findById);
+routerRoles.post("/roleFindsId", RolesController.findById);
+
+routerRoles.post("/roleFindsByMail", RolesController.findByMail);
 
 routerRoles.post("/roleCreate", RolesController.createRole);
 

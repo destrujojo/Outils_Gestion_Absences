@@ -4,10 +4,11 @@ const Notification = require("../Models/NotificationsModels");
 
 class NotificationsController {
   async createNotification(req: Request, res: Response) {
-    const notifications = new Notification(req.body);
+    const { idStatusNotifications, message } = new Notification(req.body);
     try {
       const newNotification = await NotificationsDao.createNotifications(
-        notifications
+        idStatusNotifications,
+        message
       );
       res.status(201).json(newNotification);
     } catch (error: any) {

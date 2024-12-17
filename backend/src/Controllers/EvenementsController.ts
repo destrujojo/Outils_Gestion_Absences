@@ -4,9 +4,16 @@ const Evenement = require("../Models/EvenementsModels");
 
 class EvenementsController {
   async createEvenement(req: Request, res: Response) {
-    const evenements = new Evenement(req.body);
+    const { idTypesEvenements, commentaire, date, duree } = new Evenement(
+      req.body
+    );
     try {
-      const newEvenement = await EvenementsDao.createEvenements(evenements);
+      const newEvenement = await EvenementsDao.createEvenements(
+        idTypesEvenements,
+        commentaire,
+        date,
+        duree
+      );
       res.status(201).json(newEvenement);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

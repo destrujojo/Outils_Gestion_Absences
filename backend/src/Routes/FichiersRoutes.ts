@@ -7,10 +7,22 @@ routerFichiers.get("/fichiersFindsAll", FichiersController.findAll);
 
 routerFichiers.get("/fichiersFindsId", FichiersController.findById);
 
+routerFichiers.get(
+  "/fichiersFindsIdEvenements",
+  FichiersController.findByIdEvenements
+);
+
 routerFichiers.post("/fichiersCreate", FichiersController.createFichier);
 
 routerFichiers.put("/fichiersUpdate", FichiersController.updateFichier);
 
 routerFichiers.delete("/fichiersDelete", FichiersController.deleteFichier);
+
+routerFichiers.post("/fichierDepo", FichiersController.depoFichiers);
+
+routerFichiers.get(
+  "/fichierTelechargement",
+  FichiersController.telechargerFichiers
+);
 
 export default routerFichiers;

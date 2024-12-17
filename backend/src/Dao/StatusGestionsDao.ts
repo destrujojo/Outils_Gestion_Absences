@@ -52,6 +52,21 @@ class StatusGestionsDao {
     }
   }
 
+  async findStatusGestion(status: string): Promise<StatusGestions> {
+    const query = `
+            SELECT * FROM public."StatusGestions" WHERE "statusGestions" = $1;
+        `;
+    const values = [status];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du status de la gestion: ${error.message}`
+      );
+    }
+  }
+
   async updateStatusGestions(
     statusGestions: StatusGestions
   ): Promise<StatusGestions> {

@@ -1,5 +1,7 @@
+import { UUID } from "crypto";
+
 export interface FormatsFichiers {
-  idFormatsFichiers: number;
+  idFormatsFichiers: UUID;
   formatsFichiers: string;
 }
 

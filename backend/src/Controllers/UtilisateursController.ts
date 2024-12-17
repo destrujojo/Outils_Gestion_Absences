@@ -59,6 +59,18 @@ class UtilisateursController {
     }
   }
 
+  async findByEmailEtudiant(req: Request, res: Response) {
+    const email = req.body.mail;
+    try {
+      const utilisateur = await UtilisateursDao.findByMailEtudiant(email);
+      res.status(200).json(utilisateur);
+      // return true;
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+      // return false;
+    }
+  }
+
   async updateUtilisateur(req: Request, res: Response) {
     const utilisateur = new Utilisateur(req.body);
     try {

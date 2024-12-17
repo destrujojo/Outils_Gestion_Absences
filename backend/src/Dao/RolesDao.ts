@@ -64,6 +64,24 @@ class RolesDao {
     }
   }
 
+  async findByMail(mail: string): Promise<Roles> {
+    const query = `
+            SELECT rol.* 
+            FROM public."Utilisateurs" uti
+              LEFT JOIN public."Roles" rol ON rol."idRoles" = uti."idRoles"
+            WHERE uti."mail" = $1;
+        `;
+    const values = [mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du rôle: ${error.message}`
+      );
+    }
+  }
+
   async updateRoles(roles: Roles): Promise<Roles> {
     const query = `
             UPDATE public."Roles"

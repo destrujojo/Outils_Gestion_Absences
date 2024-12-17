@@ -13,6 +13,11 @@ routerUtilisateurs.post(
 );
 
 routerUtilisateurs.post(
+  "/utilisateurFindsEmailEtudiant",
+  UtilisateursController.findByEmailEtudiant
+);
+
+routerUtilisateurs.post(
   "/utilisateurCreate",
   UtilisateursController.createUtilisateur
 );

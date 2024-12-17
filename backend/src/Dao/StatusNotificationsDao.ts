@@ -1,6 +1,7 @@
 import { QueryResult } from "pg";
 import pool from "../Db/Db";
 import StatusNotification from "../Models/StatusNotificationsModels";
+import { UUID } from "crypto";
 
 class StatusNotificationDao {
   async createStatusNotifications(
@@ -45,6 +46,21 @@ class StatusNotificationDao {
     try {
       const result: QueryResult = await pool.query(query, values);
       return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du statut de notification: ${error.message}`
+      );
+    }
+  }
+
+  async findStatusNotification(status: string): Promise<UUID> {
+    const query = `
+            SELECT "idStatusNotifications" FROM public."StatusNotifications" WHERE "statusNotifications" = $1;
+        `;
+    const values = [status];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0].idStatusNotifications;
     } catch (error: any) {
       throw new Error(
         `Erreur lors de la récupération du statut de notification: ${error.message}`

@@ -1,17 +1,19 @@
 import { QueryResult } from "pg";
 import pool from "../Db/Db";
 import Notifications from "../Models/NotificationsModels";
+import { UUID } from "crypto";
 
 class NotificationsDao {
   async createNotifications(
-    notifications: Notifications
+    idStatusNotifications: UUID,
+    message: string
   ): Promise<Notifications> {
     const query = `
-            INSERT INTO public."Notifications" (idStatusNotifications, message) 
-            VALUES ($1, $2)
+            INSERT INTO public."Notifications" ("idNotifications", "idStatusNotifications", "message") 
+            VALUES (gen_random_uuid(), $1, $2)
             RETURNING *;
         `;
-    const values = [notifications.idStatusNotifications, notifications.message];
+    const values = [idStatusNotifications, message];
 
     try {
       const result: QueryResult = await pool.query(query, values);

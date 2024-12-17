@@ -6,11 +6,17 @@ import useGenerateCode from "./../hooks/useGenerateCode";
 import useResetCode from "./../hooks/useResetCode";
 import useUpdateMdp from "./../hooks/useUpdateMdp";
 import useVerifCode from "./../hooks/useVerifCode";
-import { setAuthStatus, getAuthStatus } from "../utils/authUtils";
+import useGetRoles from "./../hooks/useGetRoles";
+import {
+  setAuthStatus,
+  getAuthStatus,
+  setMail,
+  setRole,
+} from "../utils/authUtils";
 
 export interface User {
-  IdUser: number;
-  IdRole: string;
+  idUsers: string;
+  idRoles: string;
   Name: string;
   Surname: string;
   Email: string;
@@ -63,6 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { resetCode: resetCodeHook } = useResetCode();
   const { updateMdp: updateMdpHook } = useUpdateMdp();
   const { verifCode: verifCodeHook, error: verifCodeError } = useVerifCode();
+  const { getRoles: getRolesHook } = useGetRoles();
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     getAuthStatus()
@@ -72,12 +79,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      // On tente de se connecter avec les identifiants de l'utilisateur
       await loginRequest(email, password);
-      setIsAuthenticated(true);
-      setAuthStatus(true);
-      return true;
+      // Vérification que l'utilisateur est défini et qu'il a un idRole
+      try {
+        // Appel à getRoles en utilisant idRole de l'utilisateur
+        const rolesResult = await getRoles(email);
+        if (rolesResult) {
+          setIsAuthenticated(true);
+          setAuthStatus(true);
+          setMail(email);
+          setRole(rolesResult.roles);
+          return true;
+        }
+      } catch (err) {
+        console.error("Erreur lors de la récupération des rôles : ", err);
+      }
+      return false;
     } catch (err) {
-      console.error(err);
+      console.error("Erreur lors de la connexion : ", err);
       return false;
     }
   };
@@ -136,6 +156,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return true;
     } catch (err) {
       return false;
+    }
+  };
+
+  const getRoles = async (id: string) => {
+    try {
+      const roles = await getRolesHook(id);
+      return roles;
+    } catch (err) {
+      console.error(err);
     }
   };
 

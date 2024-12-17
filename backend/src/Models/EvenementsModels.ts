@@ -4,9 +4,8 @@ export interface Evenements {
   idEvenements: UUID;
   idTypesEvenements: UUID;
   commentaire: string;
-  dateDebut: Date;
-  dateFin: Date;
-  duree: number;
+  date: Date;
+  duree: string;
 }
 
 export default Evenements;

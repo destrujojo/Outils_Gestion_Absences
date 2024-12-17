@@ -1,21 +1,21 @@
 import { QueryResult } from "pg";
 import pool from "../Db/Db";
 import Evenements from "../Models/EvenementsModels";
+import { UUID } from "crypto";
 
 class EvenementsDao {
-  async createEvenements(evenements: Evenements): Promise<Evenements> {
+  async createEvenements(
+    idTypesEvenements: UUID,
+    commentaire: string,
+    date: Date,
+    duree: string
+  ): Promise<Evenements> {
     const query = `
-            INSERT INTO public."Evenements" (idEvenements, idTypeEvenements, commentaire, dateDebut, dateFin, duree) 
-            VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)
+            INSERT INTO public."Evenements" ("idEvenements", "idTypesEvenements", "commentaire", "date", "duree") 
+            VALUES (gen_random_uuid(), $1, $2, $3, $4)
             RETURNING *;
         `;
-    const values = [
-      evenements.idTypesEvenements,
-      evenements.commentaire,
-      evenements.dateDebut,
-      evenements.dateFin,
-      evenements.duree,
-    ];
+    const values = [idTypesEvenements, commentaire, date, duree];
 
     try {
       const result: QueryResult = await pool.query(query, values);
@@ -59,15 +59,14 @@ class EvenementsDao {
   async updateEvenements(evenements: Evenements): Promise<Evenements> {
     const query = `
             UPDATE public."Evenements"
-            SET "idTypeEvenements" = $1, "commentaire" = $2, "dateDebut" = $3, "dateFin" = $4, "duree" = $5
+            SET "idTypeEvenements" = $1, "commentaire" = $2, "date" = $3, "duree" = $4
             WHERE "idEvenements" = $6
             RETURNING *;
         `;
     const values = [
       evenements.idTypesEvenements,
       evenements.commentaire,
-      evenements.dateDebut,
-      evenements.dateFin,
+      evenements.date,
       evenements.duree,
       evenements.idEvenements,
     ];

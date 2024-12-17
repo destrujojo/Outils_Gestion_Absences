@@ -52,6 +52,23 @@ class FormatsFichiersDao {
     }
   }
 
+  async findByExtension(
+    formatFichiers: string | undefined
+  ): Promise<FormatsFichiers> {
+    const query = `
+            SELECT * FROM public."FormatsFichiers" WHERE "formatsFichiers" = $1;
+        `;
+    const values = [formatFichiers];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du format de fichier: ${error.message}`
+      );
+    }
+  }
+
   async updateFormatsFichiers(
     formatsFichiers: FormatsFichiers
   ): Promise<FormatsFichiers> {

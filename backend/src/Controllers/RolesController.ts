@@ -32,6 +32,16 @@ class RolesController {
     }
   }
 
+  async findByMail(req: Request, res: Response) {
+    const mail = req.body.mail;
+    try {
+      const role = await RolesDao.findByMail(mail);
+      res.status(200).json(role);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async updateRole(req: Request, res: Response) {
     const role = new Role(req.body);
     try {
