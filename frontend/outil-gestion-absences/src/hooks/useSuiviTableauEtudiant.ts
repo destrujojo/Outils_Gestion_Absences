@@ -12,7 +12,7 @@ const useSuiviTableauEtudiant = () => {
   ) => {
     setLoading(true);
     setError(null);
-    console.log(mail, classes, dateDebut, dateFin);
+    console.log(mail, classes, dateDebut);
 
     try {
       const response = await fetch(

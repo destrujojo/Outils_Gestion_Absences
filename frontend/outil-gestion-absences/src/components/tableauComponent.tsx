@@ -1,3 +1,4 @@
+import Download from "@mui/icons-material/Download";
 import {
   Paper,
   Table,
@@ -9,6 +10,7 @@ import {
   TableRow,
 } from "@mui/material";
 import React from "react";
+import useTelechargementFichiers from "../hooks/useTelechargementFichiers";
 
 // Définition du type pour les colonnes
 interface Column<T> {
@@ -17,16 +19,6 @@ interface Column<T> {
   minWidth?: number;
   align?: "right" | "left" | "center"; // Alignement de la colonne
   format?: (value: any) => string; // Optionnel : fonction de formatage pour les valeurs
-}
-
-// Définition du type pour les données (lignes)
-interface Data {
-  typesEvenements: string;
-  statusGestions: string;
-  commentaire: string;
-  dateDebut: string;
-  dateFin: Date;
-  duree: number;
 }
 
 interface TableauComponentProps<T> {
@@ -42,6 +34,7 @@ export default function TableauComponent<T>({
 }: TableauComponentProps<T>) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const { telechargementFichiers } = useTelechargementFichiers();
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -52,6 +45,12 @@ export default function TableauComponent<T>({
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleDownload = (fichiers: string) => {
+    // Implémentez la logique de téléchargement ici
+    console.log("Téléchargement de :", fichiers);
+    telechargementFichiers(fichiers);
   };
 
   return (
@@ -83,10 +82,23 @@ export default function TableauComponent<T>({
                         key={column.id as string}
                         align={column.align || "left"}
                       >
-                        {column.format
-                          ? column.format(value) // Si un format est défini, l'appliquer
-                          : String(value)}{" "}
-                        {/* Sinon, afficher la valeur brute */}
+                        {column.id === "idFichiers" ? (
+                          // Si la colonne est "download", affichez l'icône de téléchargement
+                          <button
+                            onClick={() => handleDownload(value as string)} // Assurez-vous que chaque ligne ait un `pieceJointeUrl`
+                            style={{
+                              border: "none",
+                              background: "transparent",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Download fontSize="small" />
+                          </button>
+                        ) : column.format ? (
+                          column.format(value) // Si un format est défini, appliquez-le
+                        ) : (
+                          String(value) // Sinon, affichez la valeur brute
+                        )}
                       </TableCell>
                     );
                   })}

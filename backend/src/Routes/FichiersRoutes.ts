@@ -5,7 +5,7 @@ const routerFichiers = Router();
 
 routerFichiers.get("/fichiersFindsAll", FichiersController.findAll);
 
-routerFichiers.get("/fichiersFindsId", FichiersController.findById);
+routerFichiers.post("/fichiersFindsId", FichiersController.findById);
 
 routerFichiers.get(
   "/fichiersFindsIdEvenements",
@@ -21,7 +21,7 @@ routerFichiers.delete("/fichiersDelete", FichiersController.deleteFichier);
 routerFichiers.post("/fichierDepo", FichiersController.depoFichiers);
 
 routerFichiers.get(
-  "/fichierTelechargement",
+  "/fichierTelechargement/:idFichiers",
   FichiersController.telechargerFichiers
 );
 

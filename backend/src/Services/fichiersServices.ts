@@ -5,6 +5,8 @@ import scp from "node-scp";
 import { Fichiers } from "../Models/FichiersModels";
 import { UUID } from "crypto";
 import path from "path";
+import fs from "fs";
+import { Response } from "express";
 
 interface Fichier {
   fieldname: string;
@@ -119,33 +121,94 @@ class FichiersServices {
   }
 
   // Téléchargement d'un fichier
-  async telechargerFichiers(idFichier: string): Promise<Fichiers | null> {
-    if (!idFichier) {
-      throw new Error("L'identifiant du fichier est requis !");
-    }
+  // async telechargerFichiers(
+  //   idFichier: string,
+  //   res: Response
+  // ): Promise<Response | void> {
+  //   if (!idFichier) {
+  //     return res.status(400).send("L'identifiant du fichier est requis !");
+  //   }
 
+  //   try {
+  //     const fichier = await FichiersDao.findById(idFichier);
+  //     if (!fichier) {
+  //       return res.status(404).send("Fichier non trouvé !");
+  //     }
+
+  //     const client = await this.initialiserClientScp();
+  //     const userProfile = process.env.USERPROFILE || "";
+  //     const destinationLocale = path.join(
+  //       userProfile,
+  //       "downloads",
+  //       fichier.nom
+  //     );
+
+  //     console.log(
+  //       `Téléchargement du fichier : ${fichier.chemin} -> ${destinationLocale}`
+  //     );
+
+  //     // Téléchargement du fichier depuis le serveur SCP
+  //     await client.downloadFile(fichier.chemin, destinationLocale);
+  //     await client.close();
+
+  //     res.download(destinationLocale, fichier.nom, (erreur) => {
+  //       if (erreur) {
+  //         console.error(
+  //           "Erreur lors de la réponse du téléchargement :",
+  //           erreur.message
+  //         );
+  //         if (!res.headersSent) {
+  //           return res.status(500).send("Erreur lors du téléchargement.");
+  //         }
+  //       } else {
+  //         console.log("Fichier téléchargé avec succès :", fichier.nom);
+  //       }
+  //     });
+  //   } catch (erreur: any) {
+  //     console.error(
+  //       "Erreur lors du téléchargement du fichier :",
+  //       erreur.message
+  //     );
+  //     if (!res.headersSent) {
+  //       return res
+  //         .status(500)
+  //         .send(
+  //           "Erreur lors de la récupération ou du téléchargement du fichier."
+  //         );
+  //     }
+  //   }
+  // }
+
+  async telechargerFichiers(idFichier: string): Promise<string | null> {
     try {
       const fichier = await FichiersDao.findById(idFichier);
       if (!fichier) {
-        throw new Error("Fichier non trouvé !");
+        return null; // Si le fichier n'est pas trouvé
       }
 
-      const client = await this.initialiserClientScp();
-      const destinationLocale = `downloads/${fichier.nom}`;
+      const userProfile = process.env.USERPROFILE || "";
+      const destinationLocale = path.join(
+        userProfile,
+        "downloads",
+        fichier.nom
+      );
 
       console.log(
         `Téléchargement du fichier : ${fichier.chemin} -> ${destinationLocale}`
       );
-      await client.downloadFile(fichier.chemin, destinationLocale);
-      await client.close();
 
-      return fichier;
+      // Assurer que le fichier a une extension valide
+      const extname = path.extname(fichier.nom);
+      const fileWithExtension = extname ? fichier.nom : `${fichier.nom}.txt`; // Par défaut, on ajoute .txt
+
+      // Renvoie le nom du fichier à télécharger
+      return fileWithExtension;
     } catch (erreur: any) {
       console.error(
-        "Erreur lors du téléchargement du fichier :",
+        "Erreur lors de la récupération du fichier :",
         erreur.message
       );
-      throw new Error("Erreur lors de la récupération du fichier !");
+      return null;
     }
   }
 }

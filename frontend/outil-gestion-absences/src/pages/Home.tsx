@@ -31,18 +31,18 @@ const columns = [
     align: "center" as "center",
   },
   {
-    id: "dateDebut",
+    id: "date",
     label: "Date de début",
     minWidth: 100,
     align: "center" as "center",
   },
+  { id: "duree", label: "Durée", minWidth: 100, align: "center" as "center" },
   {
-    id: "dateFin",
-    label: "Date de fin",
+    id: "idFichiers",
+    label: "Fichiers",
     minWidth: 100,
     align: "center" as "center",
   },
-  { id: "duree", label: "Durée", minWidth: 100, align: "center" as "center" },
 ];
 
 export default function Home() {
@@ -50,6 +50,10 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const { gestionsTableauSuiviEtudiant } = useAccueilServices();
   const [donneesTableauEtudiant, setDonneesTableauEtudiant] = useState([]);
+
+  React.useEffect(() => {
+    recuperationDonneesTableauSuiviEtudiant();
+  }, []);
 
   async function recuperationDonneesTableauSuiviEtudiant() {
     try {
@@ -59,14 +63,12 @@ export default function Home() {
         null,
         null
       );
-      result.forEach((item: any) => {
-        item.dateDebut = format(new Date(item.dateDebut), "dd/MM/yyyy HH:mm");
-        item.dateFin = format(new Date(item.dateFin), "dd/MM/yyyy HH:mm");
+      result.forEach((element: any) => {
+        element.date = format(new Date(element.date), "dd/MM/yyyy HH:mm");
       });
 
-      console.log(result);
       console.log(getRole());
-      console.log(getMail());
+      console.log(result);
       setDonneesTableauEtudiant(result);
     } catch (error) {
       console.error(error);
@@ -138,18 +140,17 @@ export default function Home() {
                           rows={donneesTableauEtudiant}
                         />
                       </div>
+                      <button
+                        type="button"
+                        className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        onClick={recuperationDonneesTableauSuiviEtudiant}
+                      >
+                        Test
+                      </button>
                     </div>
                   </div>
                 </TabPanel>
-                <TabPanel value="2">
-                  <button
-                    type="button"
-                    className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    onClick={recuperationDonneesTableauSuiviEtudiant}
-                  >
-                    Test
-                  </button>
-                </TabPanel>
+                <TabPanel value="2"></TabPanel>
               </TabContext>
             </div>
           </div>

@@ -111,17 +111,19 @@ class GestionsDao {
         typ_eve."typesEvenements",  
         eve."commentaire",
         eve."date",
-        eve."duree"
+        eve."duree",
+		    fic."idFichiers"
       From public."Gestions" ges
         LEFT JOIN public."StatusGestions" sta_ges ON sta_ges."idStatusGestions" = ges."idStatusGestions"
         LEFT JOIN public."Utilisateurs" uti ON uti."idUtilisateurs" = ges."idUtilisateurs"
         LEFT JOIN public."Classes" cla ON cla."idClasses" = uti."idClasses"
         LEFT JOIN public."Evenements" eve ON eve."idEvenements" = ges."idEvenements"
         LEFT JOIN public."TypesEvenements" typ_eve ON typ_eve."idTypesEvenements" = eve."idTypesEvenements"
+		    LEFT JOIN public."Fichiers" fic ON fic."idEvenements" = eve."idEvenements"
       WHERE uti."mail" = $1
-      AND ($2::TEXT IS NULL OR cla."classes" = $2::TEXT)
-      AND ($3::DATE IS NULL OR eve."date" >= $3::DATE)
-      AND ($4::DATE IS NULL OR eve."date" <= $4::DATE);
+        AND ($2::TEXT IS NULL OR cla."classes" = $2::TEXT)
+        AND ($3::DATE IS NULL OR eve."date" >= $3::DATE)
+        AND ($4::DATE IS NULL OR eve."date" <= $4::DATE);
     `;
 
     const values = [mail, classes, dateDebut, dateFin];

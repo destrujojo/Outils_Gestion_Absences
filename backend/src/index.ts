@@ -32,6 +32,10 @@ app.get("/api/data", (req: Request, res: Response): void => {
   const data = { message: "Données récupérées avec succès !" };
   res.json(data);
 });
+app.use("/api/fichiers/fichierTelechargement", (req, res, next) => {
+  req.setTimeout(120000); // Timeout étendu à 2 minutes pour les téléchargements volumineux
+  next();
+});
 
 app.use("/api/roles", rolesRoutes);
 app.use("/api/classes", classesRoutes);

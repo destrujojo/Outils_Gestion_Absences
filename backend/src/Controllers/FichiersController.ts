@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import FichiersDao from "../Dao/FichiersDao";
 import fichiersServices from "../Services/fichiersServices";
+import path from "path";
 const Fichier = require("../Models/FichiersModels");
+const fs = require("fs");
 
 class FichiersController {
   async createFichier(req: Request, res: Response) {
@@ -29,7 +31,7 @@ class FichiersController {
   }
 
   async findById(req: Request, res: Response) {
-    const id = req.params.id;
+    const id = req.body.idFichiers;
     try {
       const fichier = await FichiersDao.findById(id);
       res.status(200).json(fichier);
@@ -82,13 +84,57 @@ class FichiersController {
     }
   }
 
-  async telechargerFichiers(req: Request, res: Response) {
-    const idFichiers = req.params.idFichiers;
-    try {
-      await fichiersServices.telechargerFichiers(idFichiers);
-      res.status(200).end();
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
+  // async telechargerFichiers(req: Request, res: Response) {
+  //   const idFichiers = req.params.idFichiers;
+  //   console.log(idFichiers);
+  //   try {
+  //     await fichiersServices.telechargerFichiers(idFichiers, res);
+
+  //     res.status(200).end();
+  //   } catch (error: any) {
+  //     res.status(400).json({ message: error.message });
+  //   }
+  // }
+
+  async telechargerFichiers(req: Request, res: Response): Promise<void> {
+    const { idFichiers } = req.params;
+
+    // Appeler le service pour télécharger le fichier
+    const fileName = await fichiersServices.telechargerFichiers(idFichiers);
+
+    if (!fileName) {
+      res.status(404).send("Fichier non trouvé !");
+    } else {
+      try {
+        const userProfile = process.env.USERPROFILE || "";
+        const destinationLocale = path.join(userProfile, "downloads", fileName);
+
+        // Utiliser un flux de lecture pour envoyer le fichier
+        const fichierStream = fs.createReadStream(destinationLocale);
+
+        fichierStream.on("error", (erreur: { message: any }) => {
+          console.error("Erreur lors de l'envoi du fichier :", erreur.message);
+          if (!res.headersSent) {
+            res.status(500).send("Erreur lors du téléchargement du fichier.");
+          }
+        });
+
+        // Configurer les en-têtes pour le téléchargement
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${fileName}"`
+        );
+
+        // Pipe le fichier dans la réponse
+        fichierStream.pipe(res);
+        // res.status(201).json({ fileName: fileName });
+      } catch (erreur: any) {
+        console.error("Erreur lors de l'envoi du fichier :", erreur.message);
+        if (!res.headersSent) {
+          res.status(500).send("Erreur lors de l'envoi du fichier.");
+        }
+      }
     }
   }
 }
