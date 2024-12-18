@@ -82,22 +82,26 @@ export default function TableauComponent<T>({
                         key={column.id as string}
                         align={column.align || "left"}
                       >
-                        {column.id === "idFichiers" ? (
-                          // Si la colonne est "download", affichez l'icône de téléchargement
-                          <button
-                            onClick={() => handleDownload(value as string)} // Assurez-vous que chaque ligne ait un `pieceJointeUrl`
-                            style={{
-                              border: "none",
-                              background: "transparent",
-                              cursor: "pointer",
-                            }}
-                          >
-                            <Download fontSize="small" />
-                          </button>
-                        ) : column.format ? (
-                          column.format(value) // Si un format est défini, appliquez-le
+                        {value ? (
+                          column.id === "idFichiers" ? (
+                            // Si la colonne est "download", affichez l'icône de téléchargement
+                            <button
+                              onClick={() => handleDownload(value as string)} // Assurez-vous que chaque ligne ait un `pieceJointeUrl`
+                              style={{
+                                border: "none",
+                                background: "transparent",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <Download fontSize="small" />
+                            </button>
+                          ) : column.format ? (
+                            column.format(value) // Si un format est défini, appliquez-le
+                          ) : (
+                            String(value) // Sinon, affichez la valeur brute
+                          )
                         ) : (
-                          String(value) // Sinon, affichez la valeur brute
+                          <></>
                         )}
                       </TableCell>
                     );
