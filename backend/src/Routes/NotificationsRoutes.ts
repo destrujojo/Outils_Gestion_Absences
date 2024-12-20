@@ -28,4 +28,14 @@ routerNotifications.delete(
   NotificationsController.deleteNotification
 );
 
+routerNotifications.post(
+  "/tableauNotifications",
+  NotificationsController.afficherNotifications
+);
+
+routerNotifications.post(
+  "/updateStatusNotifications",
+  NotificationsController.updateStatusNotifications
+);
+
 export default routerNotifications;

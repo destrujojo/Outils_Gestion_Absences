@@ -6,21 +6,15 @@ import { UUID } from "crypto";
 class GestionsDao {
   async createGestions(
     idUtilisateurs: UUID,
-    idNotifications: UUID,
     idEvenements: UUID,
     idStatusGestions: UUID
   ): Promise<Gestions> {
     const query = `
-            INSERT INTO public."Gestions" ("idGestions", "idUtilisateurs", "idNotifications", "idEvenements", "idStatusGestions") 
-            VALUES (gen_random_uuid(), $1, $2, $3, $4)
+            INSERT INTO public."Gestions" ("idGestions", "idUtilisateurs", "idEvenements", "idStatusGestions") 
+            VALUES (gen_random_uuid(), $1, $2, $3)
             RETURNING *;
         `;
-    const values = [
-      idUtilisateurs,
-      idNotifications,
-      idEvenements,
-      idStatusGestions,
-    ];
+    const values = [idUtilisateurs, idEvenements, idStatusGestions];
 
     try {
       const result: QueryResult = await pool.query(query, values);
@@ -46,7 +40,7 @@ class GestionsDao {
     }
   }
 
-  async findById(id: number): Promise<Gestions> {
+  async findById(id: UUID): Promise<Gestions> {
     const query = `
             SELECT * FROM public."Gestions" WHERE "idGestions" = $1;
         `;
@@ -64,13 +58,12 @@ class GestionsDao {
   async updateGestions(gestions: Gestions): Promise<Gestions> {
     const query = `
             UPDATE public."Gestions"
-            SET "idUtilisateurs" = $1, "idNotifications" = $2, "idEvenements" = $3, "idStatusGestions" = $4
+            SET "idUtilisateurs" = $1, "idEvenements" = $3, "idStatusGestions" = $4
             WHERE "idGestions" = $5
             RETURNING *;
         `;
     const values = [
       gestions.idUtilisateurs,
-      gestions.idNotifications,
       gestions.idEvenements,
       gestions.idStatusGestions,
       gestions.idGestions,
@@ -85,7 +78,7 @@ class GestionsDao {
     }
   }
 
-  async deleteGestions(id: number): Promise<void> {
+  async deleteGestions(id: UUID): Promise<void> {
     const query = `
             DELETE FROM public."Gestions"
             WHERE "idGestions" = $1;
@@ -103,8 +96,8 @@ class GestionsDao {
   async gestionsTableauSuiviEtudiant(
     mail: string,
     classes: string | null,
-    dateDebut: string | null,
-    dateFin: string | null
+    dateDebut: Date | null,
+    dateFin: Date | null
   ) {
     const query = `
       Select sta_ges."statusGestions",
@@ -132,6 +125,7 @@ class GestionsDao {
       console.log(result.rows);
       return result.rows;
     } catch (error: any) {
+      console.log(error);
       throw new Error(
         `Erreur lors de la récupération du tableau de suivi de l'étudiant: ${error.message}`
       );

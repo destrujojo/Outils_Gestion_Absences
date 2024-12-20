@@ -14,7 +14,6 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import useGetEtudiant from "../hooks/useGetEtudiant";
 import useGetTypesEvenements from "../hooks/useGetTypesEvenements";
 import useCreationEvenement from "../hooks/useCreationEvenement";
-import useDepoFichiers from "../hooks/useDepoFichiers";
 import { DateTimeField } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -53,16 +52,21 @@ const style = {
 interface FormulairePropTypes {
   mail: string;
   role: string;
+  date: Date | null;
+  onRetourGestions: (arg0: any) => void;
 }
 
-const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
+const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({
+  mail,
+  date,
+  onRetourGestions,
+}) => {
   const [disableNomPrenom, setDisableNomPrenom] = useState<boolean>(false);
   const [utilisateurs, setUtilisateurs] = useState<Utilisateur[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [localError, setLocalError] = useState("");
-  const [retourGestions, setRetourGestions] = useState<[] | null>(null);
 
   const [typeEvenement, setTypeEvenement] = useState<typeEvenement[]>([]);
   const [selectionEvenement, setSelectionEvenement] = useState<string>("");
@@ -81,9 +85,11 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
   const { getEtudiant } = useGetEtudiant();
   const { getTypesEvenements } = useGetTypesEvenements();
   const { creationEvenement } = useCreationEvenement();
-  const { depoFichiers } = useDepoFichiers();
 
-  // Charger les utilisateurs depuis l'API
+  useEffect(() => {
+    setDateDebut(date);
+  }, [date]);
+
   useEffect(() => {
     setIsLoading(true);
     const fetchUtilisateurs = async () => {
@@ -197,6 +203,7 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
   };
 
   const boutonValidationElement = () => {
+    let dureeChoix: string = "";
     return (
       <>
         <div>
@@ -217,10 +224,18 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
                   setLocalError("Veuillez sélectionner une durée d'absence");
                   return;
                 }
+                if (selectedDemiJournee === "") {
+                  dureeChoix = selectedJournee;
+                } else if (selectedJournee === "") {
+                  dureeChoix = selectedDemiJournee;
+                } else {
+                  dureeChoix = selectedJournee + " et " + selectedDemiJournee;
+                }
               } else if (selectionEvenement === "Retard") {
                 if (duree === "") {
                   setLocalError("Veuillez compléter la durée");
                 }
+                dureeChoix = duree;
               }
 
               // if (fichier !== null) {
@@ -234,10 +249,10 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
                 "Création évènement" + selectionEvenement,
                 commentaire,
                 dateDebut,
-                duree,
+                dureeChoix,
                 fichier ?? new File([], "")
               );
-              setRetourGestions(Gestions);
+              onRetourGestions(Gestions);
             }}
           >
             Valider
@@ -271,7 +286,7 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
                     className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
                   >
                     <MenuItem value="">Choisir option</MenuItem>
-                    <MenuItem value="DemiJournee">Une demi journée</MenuItem>
+                    <MenuItem value="1 Demi-Journée">Une demi journée</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl sx={{ m: 1 }} fullWidth>
@@ -283,12 +298,12 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
                       setSelectedJournee(event.target.value)
                     }
                     autoWidth
-                    label="Demi-Journée"
+                    label="Journée"
                     className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
                   >
                     <MenuItem value="">Choisir option</MenuItem>
                     {Array.from({ length: 5 }, (_, i) => (
-                      <MenuItem key={i + 1} value={`Journee${i + 1}`}>
+                      <MenuItem key={i + 1} value={`${i + 1} Journée`}>
                         {i + 1} jour
                       </MenuItem>
                     ))}
@@ -385,12 +400,9 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({ mail }) => {
                 </MenuItem>
               ))
             ) : (
-              (console.log("Aucun étudiant trouvé" + utilisateurs),
-              (
-                <MenuItem value="" disabled>
-                  Aucun étudiant trouvé
-                </MenuItem>
-              ))
+              <MenuItem value="" disabled>
+                Aucun étudiant trouvé
+              </MenuItem>
             )}
           </Select>
         </FormControl>

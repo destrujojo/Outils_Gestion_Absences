@@ -25,12 +25,12 @@ interface Fichier {
 
 class GestionsController {
   async createGestion(req: Request, res: Response) {
-    const { idUtilisateurs, idNotifications, idEvenements, idStatusGestions } =
-      new Gestion(req.body);
+    const { idUtilisateurs, idEvenements, idStatusGestions } = new Gestion(
+      req.body
+    );
     try {
       const newGestion = await GestionsDao.createGestions(
         idUtilisateurs,
-        idNotifications,
         idEvenements,
         idStatusGestions
       );
@@ -49,31 +49,11 @@ class GestionsController {
     }
   }
 
-  async findById(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
-    try {
-      const gestion = await GestionsDao.findById(id);
-      res.status(200).json(gestion);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-
   async updateGestion(req: Request, res: Response) {
     const gestion = new Gestion(req.body);
     try {
       const updateGestion = await GestionsDao.updateGestions(gestion);
       res.status(200).json(updateGestion);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-
-  async deleteGestion(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
-    try {
-      await GestionsDao.deleteGestions(id);
-      res.status(204).end();
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }

@@ -24,27 +24,20 @@ class GestionsServices {
     evenementsDuree: string,
     fichiers: Fichier | null
   ) {
-    console.log(
-      "test" + mail,
-      typeEvenements,
-      notificationsMessage,
-      evenementsMessage,
-      evenementsDate,
-      evenementsDuree
-    );
+    // console.log(
+    //   "test" + mail,
+    //   typeEvenements,
+    //   notificationsMessage,
+    //   evenementsMessage,
+    //   evenementsDate,
+    //   evenementsDuree
+    // );
     const utilisateur = await UtilisateursDao.findByMail(mail);
     if (!utilisateur) {
       throw new Error("L'utilisateur n'existe pas");
     }
     // console.log("1" + utilisateur);
 
-    const Notifications = await NotificationsServices.creationNotification(
-      notificationsMessage
-    );
-    console.log(Notifications);
-    if (!Notifications) {
-      throw new Error("La notification n'a pas pu être créée");
-    }
     // console.log("2" + Notifications);
 
     const Evenements = await EvenementsServices.createEvenement(
@@ -56,7 +49,7 @@ class GestionsServices {
     if (!Evenements) {
       throw new Error("L'événement n'a pas pu être créé");
     }
-    console.log("3" + Evenements);
+    // console.log("3" + Evenements);
 
     if (fichiers) {
       const Fichiers = await fichiersServices.depoFichiers(
@@ -67,7 +60,7 @@ class GestionsServices {
       if (!Fichiers) {
         throw new Error("Le fichier n'a pas pu être déposé");
       }
-      console.log("4" + Fichiers);
+      // console.log("4" + Fichiers);
     }
 
     const StatusGestions = await StatusGestionsDao.findStatusGestion(
@@ -76,14 +69,30 @@ class GestionsServices {
     if (!StatusGestions) {
       throw new Error("Le status de gestion n'existe pas");
     }
-    console.log("5" + StatusGestions);
+    // console.log("5" + StatusGestions);
 
-    return await GestionsDao.createGestions(
+    const gestions = await GestionsDao.createGestions(
       utilisateur.idUtilisateurs,
-      Notifications.idNotifications,
       Evenements.idEvenements,
       StatusGestions.idStatusGestions
     );
+
+    const Notifications = await NotificationsServices.creationNotification(
+      gestions.idGestions,
+      notificationsMessage
+    );
+    console.log(Notifications);
+    if (!Notifications) {
+      throw new Error("La notification n'a pas pu être créée");
+    }
+
+    // const NotificationsAdmin =
+    //   await NotificationsServices.creationNotificationAdmin(
+    //     gestions.idGestions,
+    //     notificationsMessage
+    //   );
+
+    return gestions;
   }
 }
 

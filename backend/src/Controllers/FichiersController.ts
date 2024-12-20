@@ -100,17 +100,14 @@ class FichiersController {
     const { idFichiers } = req.params;
 
     // Appeler le service pour télécharger le fichier
-    const fileName = await fichiersServices.telechargerFichiers(idFichiers);
+    const fichier = await fichiersServices.telechargerFichiers(idFichiers);
 
-    if (!fileName) {
+    if (!fichier) {
       res.status(404).send("Fichier non trouvé !");
     } else {
       try {
-        const userProfile = process.env.USERPROFILE || "";
-        const destinationLocale = path.join(userProfile, "downloads", fileName);
-
         // Utiliser un flux de lecture pour envoyer le fichier
-        const fichierStream = fs.createReadStream(destinationLocale);
+        const fichierStream = fs.createReadStream(fichier.chemin);
 
         fichierStream.on("error", (erreur: { message: any }) => {
           console.error("Erreur lors de l'envoi du fichier :", erreur.message);
@@ -123,7 +120,7 @@ class FichiersController {
         res.setHeader("Content-Type", "application/octet-stream");
         res.setHeader(
           "Content-Disposition",
-          `attachment; filename="${fileName}"`
+          `attachment; filename="${fichier.nom}"`
         );
 
         // Pipe le fichier dans la réponse

@@ -17,8 +17,6 @@ const upload = multer({ storage });
 
 routerGestions.get("/gestionFindsAll", GestionsController.findAll);
 
-routerGestions.get("/gestionFindsId", GestionsController.findById);
-
 routerGestions.post("/gestionCreate", GestionsController.createGestion);
 
 routerGestions.post(
@@ -33,7 +31,5 @@ routerGestions.post(
 );
 
 routerGestions.put("/gestionUpdate", GestionsController.updateGestion);
-
-routerGestions.delete("/gestionDelete", GestionsController.deleteGestion);
 
 export default routerGestions;

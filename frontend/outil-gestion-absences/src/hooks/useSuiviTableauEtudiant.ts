@@ -7,12 +7,11 @@ const useSuiviTableauEtudiant = () => {
   const getSuiviTableauEtudiant = async (
     mail: string,
     classes: string | null,
-    dateDebut: string | null,
-    dateFin: string | null
+    dateDebut: Date | null,
+    dateFin: Date | null
   ) => {
     setLoading(true);
     setError(null);
-    console.log(mail, classes, dateDebut);
 
     try {
       const response = await fetch(

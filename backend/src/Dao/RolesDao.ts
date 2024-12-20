@@ -64,6 +64,21 @@ class RolesDao {
     }
   }
 
+  async findRoles(roles: string): Promise<Roles> {
+    const query = `
+            SELECT * FROM public."Roles" WHERE "roles" = $1;
+        `;
+    const values = [roles];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du rôle: ${error.message}`
+      );
+    }
+  }
+
   async findByMail(mail: string): Promise<Roles> {
     const query = `
             SELECT rol.* 

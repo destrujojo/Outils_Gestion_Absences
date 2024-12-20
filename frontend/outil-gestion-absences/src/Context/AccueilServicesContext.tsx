@@ -1,13 +1,15 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import useSuiviTableauEtudiant from "../hooks/useSuiviTableauEtudiant";
+import useSuiviTableauNotificationsEtudiant from "../hooks/useSuiviTableauNotificationsEtudiant";
 
 interface AccueilServicesContexteType {
   gestionsTableauSuiviEtudiant: (
     mail: string,
     classes: string | null,
-    dateDebut: string | null,
-    dateFin: string | null
+    dateDebut: Date | null,
+    dateFin: Date | null
   ) => Promise<any>;
+  gestionsTableauSuiviNotificationsEtudiant: (mail: string) => Promise<any>;
 }
 
 const AccueilServicesContext = createContext<
@@ -20,18 +22,24 @@ export const AccueilServicesProvider = ({
   children: ReactNode;
 }) => {
   const { getSuiviTableauEtudiant: getsuivi } = useSuiviTableauEtudiant();
+  const { suiviTableauNotificationsEtudiant: getsuiviNotifications } =
+    useSuiviTableauNotificationsEtudiant();
 
   const gestionsTableauSuiviEtudiant = async (
     mail: string,
     classes: string | null,
-    dateDebut: string | null,
-    dateFin: string | null
+    dateDebut: Date | null,
+    dateFin: Date | null
   ) => getsuivi(mail, classes, dateDebut, dateFin);
+
+  const gestionsTableauSuiviNotificationsEtudiant = async (mail: string) =>
+    getsuiviNotifications(mail);
 
   return (
     <AccueilServicesContext.Provider
       value={{
         gestionsTableauSuiviEtudiant,
+        gestionsTableauSuiviNotificationsEtudiant,
       }}
     >
       {children}
