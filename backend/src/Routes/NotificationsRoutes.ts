@@ -34,6 +34,11 @@ routerNotifications.post(
 );
 
 routerNotifications.post(
+  "/tableauNotificationsAdmin",
+  NotificationsController.afficherNotificationsAdmin
+);
+
+routerNotifications.post(
   "/updateStatusNotifications",
   NotificationsController.updateStatusNotifications
 );

@@ -147,6 +147,37 @@ class NotificationsDao {
       );
     }
   }
+
+  async tableauNotificationsAdmin() {
+    const query = `
+    SELECT noti."idNotifications",
+      ges."idGestions",
+      typ_eve."typesEvenements",
+      eve."date",
+      eve."commentaire", 
+      noti."message",
+      sta_ges."statusGestions",
+      sta_noti."statusNotifications"
+    FROM public."Notifications" noti
+      LEFT JOIN public."StatusNotifications" sta_noti ON sta_noti."idStatusNotifications" = noti."idStatusNotifications"
+      LEFT JOIN public."Gestions" ges ON ges."idGestions" = noti."idGestions"
+      LEFT JOIN public."StatusGestions" sta_ges ON sta_ges."idStatusGestions" = ges."idStatusGestions"
+      LEFT JOIN public."Utilisateurs" uti ON uti."idUtilisateurs" = ges."idUtilisateurs"
+      LEFT JOIN public."Evenements" eve ON eve."idEvenements" = ges."idEvenements"
+      LEFT JOIN public."TypesEvenements" typ_eve ON typ_eve."idTypesEvenements" = eve."idTypesEvenements"
+      LEFT JOIN public."Roles" rol ON rol."idRoles" = noti."idRoles"
+    WHERE rol."roles" = 'Admin'
+    ORDER BY eve."date" DESC;
+    `;
+    try {
+      const result = await pool.query(query);
+      return result.rows;
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération des notifications: ${error.message}`
+      );
+    }
+  }
 }
 
 export default new NotificationsDao();

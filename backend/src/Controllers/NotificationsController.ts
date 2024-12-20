@@ -71,6 +71,15 @@ class NotificationsController {
     }
   }
 
+  async afficherNotificationsAdmin(req: Request, res: Response) {
+    try {
+      const notifications = await NotificationsDao.tableauNotificationsAdmin();
+      res.status(200).json(notifications);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async updateStatusNotifications(req: Request, res: Response) {
     const { idNotifications, statusNotifications } = req.body;
     try {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputForm from "../components/InputForm";
 import { useAuth } from "./../auth/AuthContext";
+import { getRole } from "../utils/authUtils";
 
 export default function Login() {
   const {
@@ -71,7 +72,12 @@ export default function Login() {
       return;
     }
     resetData();
-    navigate("/");
+
+    if (getRole() === "Admin") {
+      navigate("/Home_Admin");
+    } else {
+      navigate("/");
+    }
   };
 
   const handleReset = async (event: React.FormEvent<HTMLFormElement>) => {

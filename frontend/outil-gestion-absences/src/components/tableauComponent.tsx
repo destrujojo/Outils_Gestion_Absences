@@ -23,6 +23,7 @@ interface Column<T> {
 }
 
 interface RowData {
+  idGestions: string;
   idNotifications?: string;
   statusNotifications?: string;
 }
@@ -72,6 +73,14 @@ export default function TableauComponent<T extends RowData>({
     }
   };
 
+  const handleStatusGestions = (idGestions: string, status: string) => {
+    // console.log("idGestions", idGestions);
+    // console.log("status", status);
+    if (onStatusChange) {
+      onStatusChange(idGestions, status);
+    }
+  };
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -79,7 +88,11 @@ export default function TableauComponent<T extends RowData>({
           <TableHead>
             <TableRow>
               {columns
-                .filter((column) => column.id !== "idStatusNotifications")
+                .filter(
+                  (column) =>
+                    column.id !== "idNotifications" &&
+                    column.id !== "idGestions"
+                )
                 .map((column) => (
                   <TableCell
                     key={column.id as string}
@@ -97,7 +110,11 @@ export default function TableauComponent<T extends RowData>({
               .map((row, rowIndex) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
                   {columns
-                    .filter((column) => column.id !== "idStatusNotifications")
+                    .filter(
+                      (column) =>
+                        column.id !== "idNotifications" &&
+                        column.id !== "idGestions"
+                    )
                     .map((column) => {
                       const value = row[column.id];
                       return (
@@ -129,6 +146,31 @@ export default function TableauComponent<T extends RowData>({
                               >
                                 {String(value)}
                               </button>
+                            ) : column.label === "Validation" ? (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleStatusGestions(
+                                      row.idGestions || "",
+                                      "Accepter"
+                                    )
+                                  }
+                                  className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                  Accepter
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleStatusGestions(
+                                      row.idGestions || "",
+                                      "Refuser"
+                                    )
+                                  }
+                                  className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                  Refuser
+                                </button>
+                              </>
                             ) : column.format ? (
                               column.format(value)
                             ) : (

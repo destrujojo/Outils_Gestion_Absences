@@ -70,7 +70,10 @@ class UtilisateursDao {
 
   async findAll(): Promise<Utilisateurs[]> {
     const query = `
-            SELECT * FROM public."Utilisateurs";
+            SELECT uti.* 
+            FROM public."Utilisateurs" uti
+            LEFT JOIN public."Roles" rol ON rol."idRoles" = uti."idRoles"
+            WHERE rol."roles" = 'Etudiant';
         `;
     try {
       const result: QueryResult = await pool.query(query);

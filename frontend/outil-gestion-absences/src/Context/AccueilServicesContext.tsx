@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import useSuiviTableauEtudiant from "../hooks/useSuiviTableauEtudiant";
 import useSuiviTableauNotificationsEtudiant from "../hooks/useSuiviTableauNotificationsEtudiant";
+import useSuiviTableauNotificationsAdmin from "../hooks/useSuiviTableauNotificationsAdmin";
 
 interface AccueilServicesContexteType {
   gestionsTableauSuiviEtudiant: (
@@ -10,6 +11,7 @@ interface AccueilServicesContexteType {
     dateFin: Date | null
   ) => Promise<any>;
   gestionsTableauSuiviNotificationsEtudiant: (mail: string) => Promise<any>;
+  gestionsTableauSuiviNotificationsAdmin: () => Promise<any>;
 }
 
 const AccueilServicesContext = createContext<
@@ -24,6 +26,8 @@ export const AccueilServicesProvider = ({
   const { getSuiviTableauEtudiant: getsuivi } = useSuiviTableauEtudiant();
   const { suiviTableauNotificationsEtudiant: getsuiviNotifications } =
     useSuiviTableauNotificationsEtudiant();
+  const { suiviTableauNotificationsAdmin: getSuivieTableauNotificationAdmin } =
+    useSuiviTableauNotificationsAdmin();
 
   const gestionsTableauSuiviEtudiant = async (
     mail: string,
@@ -35,11 +39,15 @@ export const AccueilServicesProvider = ({
   const gestionsTableauSuiviNotificationsEtudiant = async (mail: string) =>
     getsuiviNotifications(mail);
 
+  const gestionsTableauSuiviNotificationsAdmin = async () =>
+    getSuivieTableauNotificationAdmin();
+
   return (
     <AccueilServicesContext.Provider
       value={{
         gestionsTableauSuiviEtudiant,
         gestionsTableauSuiviNotificationsEtudiant,
+        gestionsTableauSuiviNotificationsAdmin,
       }}
     >
       {children}

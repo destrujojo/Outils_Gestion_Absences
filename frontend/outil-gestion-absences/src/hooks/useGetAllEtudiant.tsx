@@ -1,14 +1,13 @@
-const useGetRoles = () => {
-  const getRoles = async (mail: string) => {
+const useGetAllEtudiant = () => {
+  const getAllEtudiant = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/roles/roleFindsByMail",
+        "http://localhost:5000/api/utilisateurs//utilisateurFindsAll",
         {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ mail }),
         }
       );
       const data = await response.json();
@@ -17,7 +16,7 @@ const useGetRoles = () => {
       console.error(error);
     }
   };
-  return { getRoles };
+  return { getAllEtudiant };
 };
 
-export default useGetRoles;
+export default useGetAllEtudiant;
