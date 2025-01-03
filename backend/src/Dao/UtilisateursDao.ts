@@ -72,8 +72,9 @@ class UtilisateursDao {
     const query = `
             SELECT uti.* 
             FROM public."Utilisateurs" uti
-            LEFT JOIN public."Roles" rol ON rol."idRoles" = uti."idRoles"
-            WHERE rol."roles" = 'Etudiant';
+              LEFT JOIN public."Roles" rol ON rol."idRoles" = uti."idRoles"
+            WHERE rol."roles" = 'Etudiant'
+            ORDER BY uti."nom" ASC, uti."prenom" ASC;
         `;
     try {
       const result: QueryResult = await pool.query(query);

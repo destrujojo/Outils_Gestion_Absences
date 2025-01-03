@@ -147,30 +147,48 @@ export default function TableauComponent<T extends RowData>({
                                 {String(value)}
                               </button>
                             ) : column.label === "Validation" ? (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    handleStatusGestions(
-                                      row.idGestions || "",
-                                      "Accepter"
-                                    )
-                                  }
-                                  className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                >
-                                  Accepter
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    handleStatusGestions(
-                                      row.idGestions || "",
-                                      "Refuser"
-                                    )
-                                  }
-                                  className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                >
-                                  Refuser
-                                </button>
-                              </>
+                              value === "En attente" ? (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      handleStatusGestions(
+                                        row.idGestions || "",
+                                        "Valider"
+                                      )
+                                    }
+                                    className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                  >
+                                    Accepter
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleStatusGestions(
+                                        row.idGestions || "",
+                                        "Refuser"
+                                      )
+                                    }
+                                    className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                  >
+                                    Refuser
+                                  </button>
+                                </>
+                              ) : value === "Refuser" ? (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      handleStatusGestions(
+                                        row.idGestions || "",
+                                        "Valider"
+                                      )
+                                    }
+                                    className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                  >
+                                    Accepter
+                                  </button>
+                                </>
+                              ) : (
+                                <></>
+                              )
                             ) : column.format ? (
                               column.format(value)
                             ) : (

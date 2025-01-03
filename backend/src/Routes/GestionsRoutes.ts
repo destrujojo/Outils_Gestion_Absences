@@ -25,6 +25,16 @@ routerGestions.post(
 );
 
 routerGestions.post(
+  "/gestionsTableauBord",
+  GestionsController.gestionsTableauBord
+);
+
+routerGestions.post(
+  "/updateStatusGestions",
+  GestionsController.updateStatusGestions
+);
+
+routerGestions.post(
   "/gestionsCreationEvenements",
   upload.single("fichier"),
   GestionsController.creationGestions

@@ -14,7 +14,7 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import useGetEtudiant from "../hooks/useGetEtudiant";
 import useGetTypesEvenements from "../hooks/useGetTypesEvenements";
 import useCreationEvenement from "../hooks/useCreationEvenement";
-import { DateTimeField } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -407,7 +407,7 @@ const FormulaireEtudiant: React.FC<FormulairePropTypes> = ({
           </Select>
         </FormControl>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimeField
+          <DatePicker
             label="Date Début"
             value={dateDebut}
             format="dd/MM/yyyy HH:mm"

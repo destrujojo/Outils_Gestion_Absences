@@ -122,12 +122,77 @@ class GestionsDao {
     const values = [mail, classes, dateDebut, dateFin];
     try {
       const result: QueryResult = await pool.query(query, values);
-      console.log(result.rows);
+      // console.log(result.rows);
       return result.rows;
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
       throw new Error(
         `Erreur lors de la récupération du tableau de suivi de l'étudiant: ${error.message}`
+      );
+    }
+  }
+
+  async gestionsTableauBord(
+    mail: string | null,
+    classes: string | null,
+    dateDebut: Date | null,
+    dateFin: Date | null
+  ) {
+    const query = `
+      Select concat(uti."nom", ' ', uti."prenom") as "nomPrenom",
+        cla."classes",
+        eve."date",
+        typ_eve."typesEvenements", 
+        eve."duree",
+        eve."commentaire",
+        sta_ges."statusGestions",
+        fic."idFichiers"
+      From public."Gestions" ges
+        LEFT JOIN public."StatusGestions" sta_ges ON sta_ges."idStatusGestions" = ges."idStatusGestions"
+        LEFT JOIN public."Utilisateurs" uti ON uti."idUtilisateurs" = ges."idUtilisateurs"
+        LEFT JOIN public."Classes" cla ON cla."idClasses" = uti."idClasses"
+        LEFT JOIN public."Evenements" eve ON eve."idEvenements" = ges."idEvenements"
+        LEFT JOIN public."TypesEvenements" typ_eve ON typ_eve."idTypesEvenements" = eve."idTypesEvenements"
+        LEFT JOIN public."Fichiers" fic ON fic."idEvenements" = eve."idEvenements"
+      WHERE ($1::TEXT IS NULL OR uti."mail" = $1::TEXT)
+        AND ($2::TEXT IS NULL OR cla."classes" = $2::TEXT)
+        AND ($3::DATE IS NULL OR eve."date" >= $3::DATE)
+        AND ($4::DATE IS NULL OR eve."date" <= $4::DATE)
+      ORDER BY uti."nom" ASC, uti."prenom" ASC, eve."date" DESC;
+    `;
+    if (mail === "") mail = null;
+    if (classes === "") classes = null;
+    console.log(mail, classes, dateDebut, dateFin);
+    const values = [mail, classes, dateDebut, dateFin];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      // console.log(result.rows);
+      return result.rows;
+    } catch (error: any) {
+      // console.log(error);
+      throw new Error(
+        `Erreur lors de la récupération du tableau de bord: ${error.message}`
+      );
+    }
+  }
+
+  async updateStatusGestions(
+    idGestions: UUID,
+    idStatusGestions: UUID
+  ): Promise<Gestions> {
+    const query = `
+            UPDATE public."Gestions"
+            SET "idStatusGestions" = $1
+            WHERE "idGestions" = $2
+            RETURNING *;
+        `;
+    const values = [idStatusGestions, idGestions];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la modification du statut de gestion: ${error.message}`
       );
     }
   }

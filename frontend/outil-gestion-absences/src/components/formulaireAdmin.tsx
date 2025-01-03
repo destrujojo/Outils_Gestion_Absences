@@ -14,7 +14,7 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import useGetAllEtudiant from "../hooks/useGetAllEtudiant";
 import useGetTypesEvenements from "../hooks/useGetTypesEvenements";
 import useCreationEvenement from "../hooks/useCreationEvenement";
-import { DateTimeField } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -131,6 +131,7 @@ const FormulaireAdmin: React.FC<FormulairePropTypes> = ({
   useEffect(() => {
     if (utilisateurs.length > 0) {
       setSelectedUser(utilisateurs[0].mail);
+      setMail(utilisateurs[0].mail);
     } else {
       console.log("Aucun utilisateur trouvé");
     }
@@ -141,6 +142,7 @@ const FormulaireAdmin: React.FC<FormulairePropTypes> = ({
   // Gestionnaire de changement pour la sélection
   const handleUserChange = (event: SelectChangeEvent<string>) => {
     setSelectedUser(event.target.value);
+    // console.log("Utilisateur sélectionné:", event.target.value);
     setMail(event.target.value);
   };
 
@@ -404,7 +406,7 @@ const FormulaireAdmin: React.FC<FormulairePropTypes> = ({
           </Select>
         </FormControl>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimeField
+          <DatePicker
             label="Date Début"
             value={dateDebut}
             format="dd/MM/yyyy HH:mm"

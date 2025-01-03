@@ -11,7 +11,7 @@ class NotificationServices {
 
     const idRoles = await RolesDao.findRoles("Etudiant");
 
-    console.log("idStatusNotifications", idStatusNotifications);
+    // console.log("idStatusNotifications", idStatusNotifications);
 
     try {
       const newNotification = await NotificationsDao.createNotifications(

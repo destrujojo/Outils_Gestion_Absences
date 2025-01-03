@@ -78,6 +78,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isVerifMail, setIsVerifMail] = useState<boolean>(false);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    // setIsAuthenticated(true);
+    // setAuthStatus(true);
+    // setMail(email);
+    // setRole("Admin");
+    // return true;
     try {
       // On tente de se connecter avec les identifiants de l'utilisateur
       await loginRequest(email, password);

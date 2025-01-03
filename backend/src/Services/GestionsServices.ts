@@ -5,6 +5,8 @@ import StatusGestionsDao from "../Dao/StatusGestionsDao";
 import NotificationsServices from "./NotificationsServices";
 import EvenementsServices from "./EvenementsServices";
 import fichiersServices from "./fichiersServices";
+import { UUID } from "crypto";
+import StatusNotificationsDao from "../Dao/StatusNotificationsDao";
 
 interface Fichier {
   fieldname: string;
@@ -86,13 +88,39 @@ class GestionsServices {
       throw new Error("La notification n'a pas pu être créée");
     }
 
-    // const NotificationsAdmin =
-    //   await NotificationsServices.creationNotificationAdmin(
-    //     gestions.idGestions,
-    //     notificationsMessage
-    //   );
+    await NotificationsServices.creationNotificationAdmin(
+      gestions.idGestions,
+      notificationsMessage
+    );
 
     return gestions;
+  }
+
+  async updateStatusGestions(
+    idGestions: UUID,
+    status: string,
+    message: string
+  ) {
+    try {
+      const idStatusGestions = await StatusGestionsDao.findStatusGestion(
+        status
+      );
+      if (!idStatusGestions) {
+        throw new Error("Le status de gestion n'existe pas");
+      }
+      const gestions = await GestionsDao.updateStatusGestions(
+        idGestions,
+        idStatusGestions.idStatusGestions
+      );
+
+      await NotificationsServices.creationNotification(
+        gestions.idGestions,
+        message
+      );
+      return gestions;
+    } catch (error) {
+      throw new Error(`Erreur lors de la mise à jour du statut de gestion`);
+    }
   }
 }
 

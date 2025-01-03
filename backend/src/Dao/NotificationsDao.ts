@@ -150,13 +150,16 @@ class NotificationsDao {
 
   async tableauNotificationsAdmin() {
     const query = `
-    SELECT noti."idNotifications",
+    SELECT CONCAT(uti."nom", ' ', uti."prenom") AS "nomPrenom",
+      noti."idNotifications",
       ges."idGestions",
       typ_eve."typesEvenements",
       eve."date",
       eve."commentaire", 
       noti."message",
       sta_ges."statusGestions",
+      sta_ges."statusGestions" as "statusGestionsBnt",
+      fic."idFichiers",
       sta_noti."statusNotifications"
     FROM public."Notifications" noti
       LEFT JOIN public."StatusNotifications" sta_noti ON sta_noti."idStatusNotifications" = noti."idStatusNotifications"
@@ -166,6 +169,7 @@ class NotificationsDao {
       LEFT JOIN public."Evenements" eve ON eve."idEvenements" = ges."idEvenements"
       LEFT JOIN public."TypesEvenements" typ_eve ON typ_eve."idTypesEvenements" = eve."idTypesEvenements"
       LEFT JOIN public."Roles" rol ON rol."idRoles" = noti."idRoles"
+      LEFT JOIN public."Fichiers" fic ON fic."idEvenements" = eve."idEvenements"
     WHERE rol."roles" = 'Admin'
     ORDER BY eve."date" DESC;
     `;

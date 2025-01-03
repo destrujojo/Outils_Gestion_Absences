@@ -5,7 +5,7 @@ const useSuiviTableauEtudiant = () => {
   const [error, setError] = useState<string | null>(null);
 
   const getSuiviTableauEtudiant = async (
-    mail: string,
+    mail: string | null,
     classes: string | null,
     dateDebut: Date | null,
     dateFin: Date | null

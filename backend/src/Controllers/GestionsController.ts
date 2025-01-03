@@ -115,6 +115,36 @@ class GestionsController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  async gestionsTableauBord(req: Request, res: Response) {
+    try {
+      const { mail, classes, dateDebut, dateFin } = req.body;
+      console.log(mail, classes, dateDebut, dateFin);
+      const tableauBord = await GestionsDao.gestionsTableauBord(
+        mail,
+        classes,
+        dateDebut,
+        dateFin
+      );
+      res.status(200).json(tableauBord);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async updateStatusGestions(req: Request, res: Response) {
+    const { idGestions, status, message } = req.body;
+    try {
+      const updateStatusGestions = await GestionsServices.updateStatusGestions(
+        idGestions,
+        status,
+        message
+      );
+      res.status(200).json(updateStatusGestions);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
 
 export default new GestionsController();

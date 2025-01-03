@@ -1,52 +1,33 @@
 import * as React from "react";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Button, Modal, Tab } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+  SelectChangeEvent,
+  Tab,
+  TextField,
+} from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { StaticDatePicker } from "@mui/x-date-pickers";
+import { DatePicker, StaticDatePicker } from "@mui/x-date-pickers";
 import { useState } from "react";
 import { useAccueilServices } from "../Context/AccueilServicesContext";
-import useStatusNotifications from "../hooks/useUpdateStatusNotifications";
+import useUpdateStatusGestions from "../hooks/useUpdateStatusGestions";
 import TableauComponent from "../components/tableauComponent";
 import FormulaireAdmin from "../components/formulaireAdmin";
-import { format, set } from "date-fns";
+import useGetAllEtudiant from "../hooks/useGetAllEtudiant";
+import useGestionsTableauBord from "../hooks/useGestionsTableauBord";
+import useGetClasses from "../hooks/useGetClasses";
+import { format } from "date-fns";
 import { getRole, getMail } from "../utils/authUtils";
-
-const colonneTableauNotifications = [
-  {
-    id: "idNotifications",
-    label: "idNotifications",
-  },
-  {
-    id: "idGestions",
-    label: "idGestions",
-  },
-  {
-    id: "typesEvenements",
-    label: "Type d'événement",
-    minWidth: 100,
-  },
-  {
-    id: "date",
-    label: "Date",
-    minWidth: 100,
-  },
-  {
-    id: "commentaire",
-    label: "Commentaire",
-    minWidth: 200,
-  },
-  {
-    id: "statusGestions",
-    label: "Etat Evenement",
-    minWidth: 200,
-  },
-  {
-    id: "statusGestions",
-    label: "Validation",
-    minWidth: 100,
-  },
-];
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import { TABLEAU_NOTIFICATION, TABLEAU_BORD } from "../constante";
 
 export default function Home_Admin() {
   const [value, setValue] = useState("1");
@@ -55,29 +36,99 @@ export default function Home_Admin() {
   const [chargement, setChargement] = useState(false);
   const [nbNotificationsNLues, setNbNotificationsNLues] = useState(0);
   const { gestionsTableauSuiviNotificationsAdmin } = useAccueilServices();
-  const { updateStatusNotifications } = useStatusNotifications();
+  const { updateStatusGestions } = useUpdateStatusGestions();
+  const { getAllEtudiant } = useGetAllEtudiant();
+  const { gestionsTableauBord } = useGestionsTableauBord();
+  const { getClasses } = useGetClasses();
+
+  const [filtreTableauBord, setFiltreTableauBord] = useState(false);
+  const [idGestions, setIdGestions] = useState("");
+  const [status, setStatus] = useState("");
 
   const [donneesNotifications, setDonneesNotifications] = useState([]);
 
-  const [dateDebut, setDateDebut] = useState<Date | null>(null); // Date de début
-  const [dateFin, setDateFin] = useState<Date | null>(null); // Date de fin
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [commentaire, setCommentaire] = useState("");
+  const [utilisateurs, setUtilisateurs] = React.useState<any[]>([]);
+  const [classes, setClasses] = React.useState<any[]>([]);
+  const [tableauBord, setTableauBord] = React.useState<any[]>([]);
+  const [tableauBordUtilisateur, setTableauBordUtilisateur] = useState<
+    string | null
+  >(null);
+  const [tableauBordClasse, setTableauBordClasse] = useState<string | null>(
+    null
+  );
+  const [tableauBordDateDebut, setTableauBordDateDebut] = useState<Date | null>(
+    null
+  );
+  const [tableauBordDateFin, setTableauBordDateFin] = useState<Date | null>(
+    null
+  );
 
   React.useEffect(() => {
+    const fetchUtilisateurs = async () => {
+      try {
+        const data = await getAllEtudiant();
+
+        // Transformation si nécessaire
+        const utilisateursArray = Array.isArray(data) ? data : [data];
+        setUtilisateurs(utilisateursArray);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des utilisateurs :",
+          error
+        );
+      }
+    };
+
+    const fetchClasses = async () => {
+      try {
+        const data = await getClasses();
+
+        // Transformation si nécessaire
+        const classesArray = Array.isArray(data) ? data : [data];
+        setClasses(classesArray);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des classes :", error);
+      }
+    };
+
     recuperationNbNotificationNLues();
+    getTableauBord();
+    fetchUtilisateurs();
+    fetchClasses();
   }, []);
 
   React.useEffect(() => {
-    if (value === "3") {
-      recuperationDonneesTableauNotifications();
+    switch (value) {
+      case "1":
+        getTableauBord();
+        break;
+      case "2":
+        break;
+      case "3":
+        recuperationDonneesTableauNotifications();
+        break;
+      case "4":
+        break;
     }
-  }, [value]);
+  }, [
+    value,
+    tableauBordUtilisateur,
+    tableauBordClasse,
+    tableauBordDateDebut,
+    tableauBordDateFin,
+  ]);
 
   React.useEffect(() => {
     if (donneesNotifications.length > 0) {
       recuperationNbNotificationNLues();
     }
-  }, [donneesNotifications]);
+    if (openGestions === false) {
+      setIdGestions("");
+      setStatus("");
+    }
+  }, [donneesNotifications, openGestions]);
 
   async function recuperationDonneesTableauNotifications() {
     try {
@@ -86,6 +137,7 @@ export default function Home_Admin() {
       result.forEach((element: any) => {
         element.date = format(new Date(element.date), "dd/MM/yyyy HH:mm");
       });
+      // console.log(result);
 
       setDonneesNotifications(result);
     } catch (error) {
@@ -105,6 +157,7 @@ export default function Home_Admin() {
     } catch (error) {
       console.error(error);
     }
+    return;
   }
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -113,10 +166,6 @@ export default function Home_Admin() {
 
   const handleOpen = () => {
     setOpen(true);
-  };
-
-  const handleOpenGestions = () => {
-    setOpenGestions(true);
   };
 
   const handleClose = () => {
@@ -131,48 +180,44 @@ export default function Home_Admin() {
     setSelectedDate(newDate);
     handleOpen();
   };
-  const handleMoisChange = (newDate: Date | null) => {
-    if (newDate) {
-      // Calcul de la plage du mois
-      const startOfMonth = new Date(
-        newDate.getFullYear(),
-        newDate.getMonth(),
-        1,
-        0,
-        0
-      );
-      const endOfMonth = new Date(
-        newDate.getFullYear(),
-        newDate.getMonth() + 1,
-        0,
-        23,
-        59
-      );
-
-      // Mise à jour des états
-      setDateDebut(startOfMonth);
-      setDateFin(endOfMonth);
-    }
-  };
 
   const handleRetourGestions = () => {
     handleClose();
   };
 
-  const handleStatusNotifications = async (
-    idNotifications: string,
-    statusNotifications: string
-  ) => {
-    // Implémentez la logique de mise à jour du statut ici
-    await updateStatusNotifications(idNotifications, statusNotifications);
-    await recuperationDonneesTableauNotifications();
+  const handleStatusGestions = async (idGestions: string, status: string) => {
+    setIdGestions(idGestions);
+    setStatus(status);
+    setOpenGestions(true);
   };
 
-  const handleStatusGestions = async (idGestions: string, status: string) => {
-    // Implémentez la logique de mise à jour du statut ici
-    // await updateStatusNotifications(idGestions, status);
-    // await recuperationDonneesTableauNotifications();
-    setOpenGestions(true);
+  const handleStatusEvenement = async () => {
+    await updateStatusGestions(idGestions, status, commentaire);
+    // console.log("le resultat " + result);
+    await recuperationDonneesTableauNotifications();
+    setCommentaire("");
+    setOpenGestions(false);
+    // console.log("Modification du status de l'événement");
+  };
+
+  const getTableauBord = async () => {
+    try {
+      setChargement(true);
+      const result = await gestionsTableauBord(
+        tableauBordUtilisateur,
+        tableauBordClasse,
+        tableauBordDateDebut,
+        tableauBordDateFin
+      );
+      result.forEach((element: any) => {
+        element.date = format(new Date(element.date), "dd/MM/yyyy HH:mm");
+      });
+      setTableauBord(result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setChargement(false);
+    }
   };
 
   return (
@@ -199,7 +244,105 @@ export default function Home_Admin() {
                     <Tab label="Intégration" value="4"></Tab>
                   </TabList>
                 </Box>
-                <TabPanel value="1">Item 1</TabPanel>
+                <TabPanel value="1">
+                  <div className="items-center justify-center p-12 bg-lightPurple">
+                    {filtreTableauBord ? (
+                      <>
+                        <Button
+                          className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                          onClick={() =>
+                            setFiltreTableauBord(!filtreTableauBord)
+                          }
+                        >
+                          <FilterAltOffIcon />
+                        </Button>
+                        <div className="flex flex-row items-center justify-center">
+                          <FormControl sx={{ m: 1 }} fullWidth>
+                            <InputLabel id="comboEleve">élève</InputLabel>
+                            <Select
+                              id="comboEleve"
+                              value={tableauBordUtilisateur}
+                              onChange={(
+                                event: SelectChangeEvent<string | null>
+                              ) =>
+                                setTableauBordUtilisateur(event.target.value)
+                              }
+                              autoWidth
+                              label="élève"
+                              className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
+                            >
+                              <MenuItem value="">Tous les étudiant</MenuItem>
+                              {utilisateurs.map((utilisateur) => (
+                                <MenuItem value={utilisateur.mail}>
+                                  {utilisateur.nom} {utilisateur.prenom}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormControl sx={{ m: 1 }} fullWidth>
+                            <InputLabel id="comboClasse">classe</InputLabel>
+                            <Select
+                              id="comboClasse"
+                              value={tableauBordClasse}
+                              onChange={(
+                                event: SelectChangeEvent<string | null>
+                              ) => setTableauBordClasse(event.target.value)}
+                              autoWidth
+                              label="classe"
+                              className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
+                            >
+                              <MenuItem value="">Toute les classes</MenuItem>
+                              {classes.map((classe) => (
+                                <MenuItem value={classe.classes}>
+                                  {classe.classes}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <DatePicker
+                              label="Date Début"
+                              value={tableauBordDateDebut}
+                              format="dd/MM/yyyy"
+                              onChange={(newValue) =>
+                                setTableauBordDateDebut(newValue)
+                              }
+                              className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
+                            />
+                          </LocalizationProvider>
+                          <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <DatePicker
+                              label="Date Fin"
+                              value={tableauBordDateFin}
+                              format="dd/MM/yyyy"
+                              onChange={(newValue) =>
+                                setTableauBordDateFin(newValue)
+                              }
+                              className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
+                            />
+                          </LocalizationProvider>
+                        </div>
+                      </>
+                    ) : (
+                      <Button
+                        className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        onClick={() => setFiltreTableauBord(!filtreTableauBord)}
+                      >
+                        <FilterAltIcon />
+                      </Button>
+                    )}
+                  </div>
+                  <div>
+                    {chargement ? (
+                      <p>Chargement des données...</p>
+                    ) : (
+                      <TableauComponent
+                        columns={TABLEAU_BORD}
+                        rows={tableauBord}
+                      />
+                    )}
+                  </div>
+                </TabPanel>
                 <TabPanel value="2">
                   <div className="flex flex-grow items-center justify-center p-12 bg-lightPurple">
                     <div className="flex flex-col items-center justify-center">
@@ -220,7 +363,6 @@ export default function Home_Admin() {
                               openTo="day"
                               value={selectedDate}
                               onChange={(newDate) => handleDateChange(newDate)}
-                              onMonthChange={handleMoisChange}
                             />
                           </LocalizationProvider>
                         </div>
@@ -238,7 +380,7 @@ export default function Home_Admin() {
                         <p>Chargement des données...</p>
                       ) : (
                         <TableauComponent
-                          columns={colonneTableauNotifications}
+                          columns={TABLEAU_NOTIFICATION}
                           rows={donneesNotifications}
                           onStatusChange={handleStatusGestions}
                         />
@@ -273,19 +415,39 @@ export default function Home_Admin() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <div className="flex flex-grow items-center justify-center pt-24 bg-lightPurple">
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-4xl font-bold text-center text-darkBlue">
-              Gestion des absences
-            </h1>
+        <Box
+          sx={{
+            position: "absolute" as "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <TextField
+            id="CommentaireRetard"
+            label="Commentaire"
+            multiline
+            maxRows={4}
+            value={commentaire}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setCommentaire(event.target.value)
+            }
+            className="flex w-full justify-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold leading-6 text-lightPurple shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 "
+          />
+          <div>
             <Button
               className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              onClick={handleCloseGestions}
+              onClick={handleStatusEvenement}
             >
-              Retour
+              Valider
             </Button>
           </div>
-        </div>
+        </Box>
       </Modal>
     </>
   );
