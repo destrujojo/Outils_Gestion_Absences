@@ -71,6 +71,54 @@ class UtilisateursController {
     }
   }
 
+  async recuperationNbEssais(req: Request, res: Response) {
+    const mail = req.body.mail;
+    try {
+      const nbEssais = await UtilisateursDao.recuperationNbEssais(mail);
+      // console.log(nbEssais);
+      res.status(200).json(nbEssais);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async recuperationBlocage(req: Request, res: Response) {
+    const mail = req.body.mail;
+    try {
+      const blocage = await UtilisateursDao.recuperationBlocage(mail);
+      // console.log(blocage);
+      res.status(200).json(blocage);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async updateBlocage(req: Request, res: Response) {
+    const { tableau } = req.body;
+    try {
+      const result = await UtilisateursServices.updateBlocage(tableau);
+      // console.log(result);
+      res.status(204).json();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  async updateNbEssais(req: Request, res: Response) {
+    const { mail, nbEssais, etat } = req.body;
+    try {
+      const result = await UtilisateursServices.updateNbEssais(
+        mail,
+        nbEssais,
+        etat
+      );
+      // console.log(result);
+      res.status(204).json();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
   async updateUtilisateur(req: Request, res: Response) {
     const utilisateur = new Utilisateur(req.body);
     try {

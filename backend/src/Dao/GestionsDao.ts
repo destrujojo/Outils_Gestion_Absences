@@ -116,7 +116,8 @@ class GestionsDao {
       WHERE uti."mail" = $1
         AND ($2::TEXT IS NULL OR cla."classes" = $2::TEXT)
         AND ($3::DATE IS NULL OR eve."date" >= $3::DATE)
-        AND ($4::DATE IS NULL OR eve."date" <= $4::DATE);
+        AND ($4::DATE IS NULL OR eve."date" <= $4::DATE)
+      ORDER BY eve."date" DESC;
     `;
 
     const values = [mail, classes, dateDebut, dateFin];

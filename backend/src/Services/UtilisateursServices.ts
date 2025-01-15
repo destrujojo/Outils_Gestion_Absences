@@ -122,6 +122,26 @@ class UtilisateursServices {
     return await UtilisateursDao.resetCode(mail);
   }
 
+  async updateBlocage(tableau: []) {
+    for (const element of tableau) {
+      const mail = element["mail"];
+      const blocage = element["blocage"];
+      await UtilisateursDao.updateBlocage(mail, blocage);
+    }
+  }
+
+  async updateNbEssais(
+    mail: string,
+    nbEssais: number,
+    etat: string
+  ): Promise<Utilisateurs> {
+    if (etat === "ok") {
+      return await UtilisateursDao.updateNbEssais(mail, 0);
+    } else {
+      return await UtilisateursDao.updateNbEssais(mail, nbEssais + 1);
+    }
+  }
+
   async updateMdp(mail: string, mdp: string): Promise<Utilisateurs> {
     const mdpHash = await bcrypt.hash(mdp, 10);
     return await UtilisateursDao.updateMdp(mail, mdpHash);

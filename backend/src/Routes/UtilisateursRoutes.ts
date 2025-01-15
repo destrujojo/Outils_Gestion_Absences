@@ -22,6 +22,26 @@ routerUtilisateurs.post(
   UtilisateursController.createUtilisateur
 );
 
+routerUtilisateurs.post(
+  "/utilisateurRecuperationNbEssais",
+  UtilisateursController.recuperationNbEssais
+);
+
+routerUtilisateurs.post(
+  "/utilisateurRecuperationBlocage",
+  UtilisateursController.recuperationBlocage
+);
+
+routerUtilisateurs.post(
+  "/utilisateurUpdateBlocage",
+  UtilisateursController.updateBlocage
+);
+
+routerUtilisateurs.post(
+  "/utilisateurUpdateNbEssais",
+  UtilisateursController.updateNbEssais
+);
+
 routerUtilisateurs.put(
   "/utilisateurUpdate",
   UtilisateursController.updateUtilisateur

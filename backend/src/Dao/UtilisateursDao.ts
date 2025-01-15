@@ -149,6 +149,76 @@ class UtilisateursDao {
     }
   }
 
+  async recuperationNbEssais(mail: string) {
+    const query = `
+            SELECT uti."nbEssais" 
+            FROM public."Utilisateurs" uti
+            WHERE uti."mail" = $1;
+        `;
+    const values = [mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du nombre d'essais: ${error.message}`
+      );
+    }
+  }
+
+  async recuperationBlocage(mail: string) {
+    const query = `
+            SELECT uti."desactiver" 
+            FROM public."Utilisateurs" uti
+            WHERE uti."mail" = $1;
+        `;
+    const values = [mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la récupération du nombre d'essais: ${error.message}`
+      );
+    }
+  }
+
+  async updateBlocage(mail: string, etat: boolean) {
+    const query = `
+            UPDATE public."Utilisateurs"
+            SET "desactiver" = $1
+            WHERE "mail" = $2
+            RETURNING *;
+        `;
+    const values = [etat, mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la mise à jour du blocage: ${error.message}`
+      );
+    }
+  }
+
+  async updateNbEssais(mail: string, nbEssais: number) {
+    const query = `
+            UPDATE public."Utilisateurs"
+            SET "nbEssais" = $1
+            WHERE "mail" = $2
+            RETURNING *;
+        `;
+    const values = [nbEssais, mail];
+    try {
+      const result: QueryResult = await pool.query(query, values);
+      return result.rows[0];
+    } catch (error: any) {
+      throw new Error(
+        `Erreur lors de la mise à jour du nombre d'essais: ${error.message}`
+      );
+    }
+  }
+
   async updateUtilisateurs(utilisateurs: Utilisateurs): Promise<Utilisateurs> {
     const query = `
             UPDATE public."Utilisateurs"

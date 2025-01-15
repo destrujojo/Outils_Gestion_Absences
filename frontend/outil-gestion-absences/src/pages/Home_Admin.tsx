@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Modal,
@@ -11,6 +12,7 @@ import {
   SelectChangeEvent,
   Tab,
   TextField,
+  Typography,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -28,6 +30,9 @@ import { getRole, getMail } from "../utils/authUtils";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import { TABLEAU_NOTIFICATION, TABLEAU_BORD } from "../constante";
+import * as XLSX from "xlsx";
+import DownloadIcon from "@mui/icons-material/Download";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function Home_Admin() {
   const [value, setValue] = useState("1");
@@ -64,6 +69,9 @@ export default function Home_Admin() {
   const [tableauBordDateFin, setTableauBordDateFin] = useState<Date | null>(
     null
   );
+
+  const [excel, setExcel] = useState<any[]>([]);
+  const [fichier, setFichier] = useState<File>();
 
   React.useEffect(() => {
     const fetchUtilisateurs = async () => {
@@ -130,6 +138,41 @@ export default function Home_Admin() {
     }
   }, [donneesNotifications, openGestions]);
 
+  async function lectureExel() {
+    if (!fichier) {
+      console.error("Aucun fichier sélectionné !");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const target = event.target as FileReader;
+      if (target) {
+        const binaryStr = target.result;
+        const workbook = XLSX.read(binaryStr, { type: "binary" });
+
+        // Supposons que vous prenez la première feuille
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // Convertir les données de la feuille en JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        const Data = jsonData.slice(1);
+
+        console.log(Data);
+
+        setExcel(Data); // Mettre à jour l'état
+      }
+    };
+
+    reader.onerror = () => {
+      console.error("Erreur lors de la lecture du fichier !");
+    };
+
+    reader.readAsBinaryString(fichier);
+  }
+
   async function recuperationDonneesTableauNotifications() {
     try {
       setChargement(true);
@@ -192,7 +235,7 @@ export default function Home_Admin() {
   };
 
   const handleStatusEvenement = async () => {
-    await updateStatusGestions(idGestions, status, commentaire);
+    await updateStatusGestions(idGestions, status, status + "" + commentaire);
     // console.log("le resultat " + result);
     await recuperationDonneesTableauNotifications();
     setCommentaire("");
@@ -218,6 +261,28 @@ export default function Home_Admin() {
     } finally {
       setChargement(false);
     }
+  };
+
+  const gérerSélectionFichier = async () => {
+    try {
+      const entrée = document.createElement("input");
+      entrée.type = "file";
+      entrée.accept = ".xlx, .xlsx"; // Extensions autorisées
+      entrée.onchange = (événement: Event) => {
+        const cible = événement.target as HTMLInputElement;
+        if (cible?.files?.[0]) {
+          const fichier = cible.files[0];
+          setFichier(fichier);
+        }
+      };
+      entrée.click();
+    } catch (erreur) {
+      console.error("Erreur lors de la sélection du fichier :", erreur);
+    }
+  };
+
+  const gérerSuppressionFichier = () => {
+    setFichier(undefined);
   };
 
   return (
@@ -388,7 +453,38 @@ export default function Home_Admin() {
                     </div>
                   </div>
                 </TabPanel>
-                <TabPanel value="4">Item Four</TabPanel>
+                <TabPanel value="4">
+                  <div className="flex flex-grow items-center justify-center pt-24 bg-lightPurple">
+                    <div className="flex flex-col items-center justify-center">
+                      <h1 className="text-4xl font-bold text-center text-darkBlue">
+                        Intégration
+                      </h1>
+                      <DownloadIcon
+                        onClick={gérerSélectionFichier}
+                        sx={{ cursor: "pointer", color: "blue" }}
+                      />
+                      {fichier?.name && (
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography variant="body2">
+                            {fichier.name}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={gérerSuppressionFichier}
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      )}
+                      <Button
+                        className="flex w-full justify-center rounded-md bg-orange px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-darkPurple focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        onClick={lectureExel}
+                      >
+                        Valider
+                      </Button>
+                    </div>
+                  </div>
+                </TabPanel>
               </TabContext>
             </div>
           </div>

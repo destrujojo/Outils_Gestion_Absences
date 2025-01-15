@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import InputForm from "../components/InputForm";
 import { useAuth } from "./../auth/AuthContext";
 import { getRole } from "../utils/authUtils";
+import useRecuperationNbEssais from "../hooks/useRecuperationNbEssais";
+import useUpdateNbEssais from "../hooks/useUpdateNbEssais";
+import useRecuperationBlocage from "../hooks/useRecuperationBlocage";
 
 export default function Login() {
   const {
@@ -17,6 +20,9 @@ export default function Login() {
     error: apiError,
   } = useAuth();
   const navigate = useNavigate();
+  const { recuperationNbEssais } = useRecuperationNbEssais();
+  const { updateNbEssais } = useUpdateNbEssais();
+  const { recuperationBlocage } = useRecuperationBlocage();
 
   // const [isRegistering, setIsRegistering] = useState(false);
   const [isReset, setIsReset] = useState(false);
@@ -65,12 +71,28 @@ export default function Login() {
       setLocalError("L'email doit se terminer pas @student.junia.com");
       return;
     }
-
     const success = await login(email, password);
-    if (!success) {
-      setLocalError("Email ou mot de passe incorrect");
+    const nbEssais = await recuperationNbEssais(email);
+    const blocage = await recuperationBlocage(email);
+    console.log(blocage);
+    if (blocage.desactiver) {
+      setLocalError("Compte désactivé, veuillez contacter un responsable");
       return;
     }
+    if (nbEssais.nbEssais >= 3) {
+      setLocalError("Compte bloqué, veuillez reset votre mot de passe");
+      return;
+    } else {
+      if (!success) {
+        await updateNbEssais(email, nbEssais.nbEssais, "ko");
+        setLocalError("Email ou mot de passe incorrect");
+        return;
+      }
+    }
+    if (success) {
+      await updateNbEssais(email, nbEssais.nbEssais, "ok");
+    }
+
     resetData();
 
     if (getRole() === "Admin") {
@@ -86,6 +108,7 @@ export default function Login() {
 
     if (password === confirmPassword) {
       await updateMdp(email, password);
+      await updateNbEssais(email, 0, "ok");
       resetData();
       setIsReset(false);
       setCodeValide(false);
